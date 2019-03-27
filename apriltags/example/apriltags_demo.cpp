@@ -22,7 +22,7 @@ using namespace std;
 #include <sys/time.h>
 #include <fstream>
 
-const string outputfile = "/home/aneesh/dev/AprilTagMIT/output/data.csv";
+string outputfile = "../output/data.csv";
 
 const string usage = "\n"
                      "Usage:\n"
@@ -40,6 +40,7 @@ const string usage = "\n"
                      "			mobile camera 1800\n"
                      "  			road camera 850\n"
                      "                     logitech 1920\n"
+                     "  -O <opfile>     Output file to route AprilTag CSV to \n"
                      "			gopro 1080p 1000\n"
                      "  -W <width>      Image width (default 640, availability depends on camera)\n"
                      "			face camera 1280\n"
@@ -245,7 +246,7 @@ public:
   void parseOptions(int argc, char *argv[])
   {
     int c;
-    while ((c = getopt(argc, argv, ":h?adtC:F:H:S:W:E:G:B:D:I:")) != -1)
+    while ((c = getopt(argc, argv, ":h?adtC:F:H:S:W:E:G:B:D:I:O:")) != -1)
     {
       // Each option character has to be in the string in getopt();
       // the first colon changes the error character from '?' to ':';
@@ -278,6 +279,9 @@ public:
       case 'H':
         m_height = atoi(optarg);
         m_py = m_height / 2;
+        break;
+      case 'O':
+        outputfile = string(optarg);
         break;
       case 'S':
         m_tagSize = atof(optarg);

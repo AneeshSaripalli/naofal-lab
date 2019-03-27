@@ -53,8 +53,14 @@ def get_r2b_proj_pos(road_csv_row, proj_vec):
     r2b_csv_file: file handle |     File handle on the output data file to pipe the projected road vector positions to
     r2b_vec:    3-tuple |   (back ^x, back ^y, back ^z) projection calculated by <back ^vec> = <road csv vec> + <proj vec>  
 '''
-def write_to_r2b_file(r2b_csv_file, frameId, detectionId, r2b_vec, hammingDistance = -1):
-    r2b_csv_file.write(str(frameId) + '\t' + str(detectionId) + '\t' + str(r2b_vec[0]) + '\t' + str(r2b_vec[1]) + '\t' + str(r2b_vec[2]) + '\t' + '\n')
+def write_to_r2b_file(r2b_csv_file, frameId, detectionId, total_dist, r2b_vec, hammingDistance = -1):
+    r2b_csv_file.write(str(frameId) + '\t' + str(detectionId) + '\t' + str(total_dist) + '\t' + str(r2b_vec[0]) + '\t' + str(r2b_vec[1]) + '\t' + str(r2b_vec[2]) + '\n')
+
+def magnitude(vector):
+    return pow(pow(vector[0], 2) + pow(vector[1], 2) + pow(vector[2], 2), .5)
+
+def write_header(r2b_proj_csv_file):
+    r2b_proj_csv_file.write('frameId' + '\t' + 'detectionId' + '\t' + 'distance' + '\t' + 'projX' + '\t' 'projY' + '\t' + 'projZ' + '\n')
 
 def main():
     parser = define_arguments() # Gets the parser object after initializing the required parameters
@@ -69,6 +75,8 @@ def main():
     except:
         print('Unable to open output R2B data file @ %s' % R2B_OUTPUT_FILE)
 
+    write_header(r2b_proj_csv_file)
+
     with open('../output/%s' % road_csv_path, 'r') as road_csv:
         csv_reader = csv.reader(road_csv, delimiter='\t')
         next(csv_reader, None)  # Skips the header row of the CSV file
@@ -76,10 +84,10 @@ def main():
             frameId = int(row[0])   # Casts the frameId value in the first column to an int
             detectionId = row[1]
             if frameId == NULL_MARKER:  # Checks if the row is a frame terminator row 
-                write_to_r2b_file(r2b_proj_csv_file, frameId, detectionId, (NULL_MARKER, NULL_MARKER, NULL_MARKER))
+                write_to_r2b_file(r2b_proj_csv_file, frameId, detectionId, 2222, (NULL_MARKER, NULL_MARKER, NULL_MARKER))
             else:
                 r2b_proj_vec = get_r2b_proj_pos(row, proj_vec)
-                write_to_r2b_file(r2b_proj_csv_file, frameId, detectionId, r2b_proj_vec)
+                write_to_r2b_file(r2b_proj_csv_file, frameId, detectionId, magnitude(r2b_proj_vec), r2b_proj_vec)
 
 if __name__ == '__main__':
     main()

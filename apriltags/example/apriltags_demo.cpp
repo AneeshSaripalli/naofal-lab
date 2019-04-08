@@ -33,6 +33,7 @@ const string usage = "\n"
                      "  -a              Arduino (send tag ids over serial port)\n"
                      "  -d              Disable graphics\n"
                      "  -t              Timing of tag extraction\n"
+                     "  -f              Include frame tag in CSV & video\n"
                      "  -C <bbxhh>      Tag family (default 36h11)\n"
                      "  -D <id>         Video device ID (if multiple cameras present)\n"
                      "  -F <fx>         Focal length in pixels\n"
@@ -158,6 +159,7 @@ class Demo
   bool m_draw;    // draw image and April tag detections?
   bool m_arduino; // send tag detections to serial port?
   bool m_timing;  // print timing information for each tag extraction call
+  bool m_frame;   // include frame count from start of video in CSV 
 
   int m_width; // image size in pixels
   int m_height;
@@ -191,6 +193,7 @@ public:
            //m_draw(true),
            m_arduino(false),
            m_timing(false),
+           m_frame(false),
 
            m_width(3840),
            m_height(2160),
@@ -246,7 +249,7 @@ public:
   void parseOptions(int argc, char *argv[])
   {
     int c;
-    while ((c = getopt(argc, argv, ":h?adtC:F:H:S:W:E:G:B:D:I:O:")) != -1)
+    while ((c = getopt(argc, argv, ":h?afdtC:F:H:S:W:E:G:B:D:I:O:")) != -1)
     {
       // Each option character has to be in the string in getopt();
       // the first colon changes the error character from '?' to ':';
@@ -262,6 +265,9 @@ public:
         break;
       case 'a':
         m_arduino = true;
+        break;
+      case 'f':
+        m_frame = true;
         break;
       case 'd':
         m_draw = false;
@@ -423,7 +429,9 @@ public:
 
     std::ofstream writefile;
     writefile.open(outputfile, std::ofstream::out);
-    writefile << "frame id\tdetection id\thamming distance\tdistance\tx\ty\tz\tyaw\tpitch\troll\n";
+    if(m_frame)
+      writefile << "frame id\t";
+    writefile << "detection id\thamming distance\tdistance\tx\ty\tz\tyaw\tpitch\troll\n";
     writefile.close();
   }
 
@@ -434,7 +442,9 @@ public:
 
     cout << "  Id: " << detection.id
          << " (Hamming: " << detection.hammingDistance << ")";
-    writefile << frame << '\t' << detection.id << '\t' << detection.hammingDistance << '\t';
+    if(m_frame)
+      writefile << frame << 't';
+    writefile << detection.id << '\t' << detection.hammingDistance << '\t';
 
     // recovering the relative pose of a tag:
 

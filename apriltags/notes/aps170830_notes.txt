@@ -19,9 +19,18 @@ mv /home/sumit/april/output/data.csv "/media/sumit/9E2B-4035/sample_video.csv"
 ./build/bin/apriltags_demo -F 1080 -W 1920 -H 1080 -S 0.176 -I /home/aneesh/host-share/videos/back-sync-vid.mp4 -d
 
 # sync vid road
-./build/bin/apriltags_demo -F 850 -W 1920 -H 1080 -S 0.176 -I "/home/aneesh/host-share/videos/road-sync-vid.mp4" -d
+./build/bin/apriltags_demo -F 1080 -W 1920 -H 1080 -S 0.176 -I "/home/aneesh/host-share/videos/road-sync-vid.mp4" -d
 
 optional -d disables graphics
+
+./build/bin/apriltags_demo -F 1080 -W 1920 -H 1080 -S 0.176 -I /home/aneesh/Desktop/shared/drive_data/back/GH010232.MP4 -O ../output/BACK_DATA_FRAMES.csv -d -f
+./build/bin/apriltags_demo -F 1080 -W 1920 -H 1080 -S 0.176 -I /home/aneesh/Desktop/shared/drive_data/road/GH010080.MP4 -O ../output/ROAD_DATA_FRAMES.csv -d -f
+
+./build/bin/apriltags_demo -F 1080 -W 1920 -H 1080 -S 0.176 -I /home/aneesh/Desktop/shared/apriltag.jpg -O ../output/APRIL_TEST.csv -f
+
+./build/bin/apriltags_demo -F 1080 -W 1920 -H 1080 -S 0.176 -I /home/aneesh/Desktop/shared/drive_data/back_clip.mp4 -O ../output/BACK_CLEAR.csv -f
+
+./build/bin/apriltags_demo -F 1080 -W 1920 -H 1080 -S 0.176 -I /home/aneesh/Desktop/shared/drive_data/road_clip.mp4 -O ../output/ROAD_CLEAR.csv -f
 
 
 
@@ -41,6 +50,7 @@ python ./scripts/move_road_to_back.py 1.99528 -.417032 -.554653 road.csv
 # sync frames
 face_frame = back_frame + 299 (frames)  # using frame clap between face cam and back cam
 back_frame = road_frame + 974 (frames)
+100	0	6.05254	5.84955	-1.30874	0.838607	-0.00751336	-0.235089	0.0614884
 
 => 
 
@@ -48,5 +58,29 @@ face_frame = road_frame + 1273 (frames)
 
 ---
 
+back    back    start   8501    ||  road    7527    ||  face    8800   
+back    back    sync    8586    ||  road    7612    ||  face    8885
+back    back    end     8838    ||  road    7864    ||  face    9137
+
+road    road    start   7501    ||  back    8475    ||  face    8774
+road    road    sync    7612    ||  back    8586    ||  face    8885
+road    road    end     8095    ||  back    9069    ||  face    9368
+
+face    face    start   8466    ||  back    8167    ||  road    7293
+face    face    sync    8885    ||  back    8586    ||  road    7612
+face    face    end     9496    ||  back    9197    ||  road    8323
+
+back - road frame_delta = 26
+
 # face_to_road script
-python3 scripts/face_to_road.py ../visualize_2/meshsave_back_2.mat ../output/road_proj_to_back.csv 14
+python3 scripts/face_to_road.py ../visualize_2/meshsave_back_2.mat ../output/road_proj_to_back.csv 26
+
+
+------
+format:
+back f# data
+road f# data
+
+back 8846	100	0	6.46331	6.44639	0.378234	0.27452	0.145369	-0.149304	-0.412234
+road ['8073', '100', '0', '5.41212', '5.30225', '-0.572182', '0.921842', '0.0186503', '-0.121512', '-0.0980312']
+

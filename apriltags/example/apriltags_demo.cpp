@@ -21,6 +21,11 @@ using namespace std;
 #include <list>
 #include <sys/time.h>
 #include <fstream>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
 
 string outputfile = "../output/data.csv";
 
@@ -41,8 +46,8 @@ const string usage = "\n"
                      "			mobile camera 1800\n"
                      "  			road camera 850\n"
                      "                     logitech 1920\n"
-                     "  -O <opfile>     Output file to route AprilTag CSV to \n"
                      "			gopro 1080p 1000\n"
+                     "  -O <opfile>     Output file to route AprilTag CSV to \n"
                      "  -W <width>      Image width (default 640, availability depends on camera)\n"
                      "			face camera 1280\n"
                      "			mobile camera 1920\n"
@@ -159,7 +164,7 @@ class Demo
   bool m_draw;    // draw image and April tag detections?
   bool m_arduino; // send tag detections to serial port?
   bool m_timing;  // print timing information for each tag extraction call
-  bool m_frame;   // include frame count from start of video in CSV 
+  bool m_frame;   // include frame count from start of video in CSV
 
   int m_width; // image size in pixels
   int m_height;
@@ -169,6 +174,7 @@ class Demo
   double m_px; // camera principal point
   double m_py;
   string in_file;
+  string in_folder;
 
   int m_deviceId; // camera id (in case of multiple cameras)
 
@@ -249,7 +255,7 @@ public:
   void parseOptions(int argc, char *argv[])
   {
     int c;
-    while ((c = getopt(argc, argv, ":h?afdtC:F:H:S:W:E:G:B:D:I:O:")) != -1)
+    while ((c = getopt(argc, argv, ":h?afdtC:F:H:S:W:E:G:B:D:I:O:M:")) != -1)
     {
       // Each option character has to be in the string in getopt();
       // the first colon changes the error character from '?' to ':';
@@ -267,6 +273,7 @@ public:
         m_arduino = true;
         break;
       case 'f':
+        cout << "Outputing frame counter" << std::endl;
         m_frame = true;
         break;
       case 'd':
@@ -295,6 +302,13 @@ public:
       case 'W':
         m_width = atoi(optarg);
         m_px = m_width / 2;
+        break;
+      case 'M':
+        printf("Expecting a folder after this\n");
+        in_folder = string(optarg);
+
+        cout << "Parsed folder " << in_folder << std::endl;
+
         break;
       case 'I':
         in_file = optarg;
@@ -341,6 +355,42 @@ public:
     }
   }
 
+
+int is_regular_file(const char *path)
+{
+    struct stat path_stat;
+    stat(path, &path_stat);
+    return S_ISREG(path_stat.st_mode);
+}
+
+  void load_files(list<const char *> *files)
+  {
+    assert(isFolder() == true);
+
+    DIR *dirptr = opendir(in_folder.c_str());
+    dirent *dp = 0;
+
+    if (errno == ENOENT)
+    {
+      printf("ERROR: Folder %s does not exist.\n", in_folder.c_str());
+      return;
+    }
+
+    while ((dp = readdir(dirptr)) != NULL)
+    {
+      // printf("%s\n", dp->d_name);
+
+      const char* file_name = dp->d_name;
+
+      if(!strcmp(file_name, ".") || !strcmp(file_name, "..")) continue;
+
+      if (files)
+        files->push_back(dp->d_name);
+    }
+
+    closedir(dirptr);
+  }
+
   void setup()
   {
     m_tagDetector = new AprilTags::TagDetector(m_tagCodes);
@@ -349,7 +399,7 @@ public:
     if (m_draw)
     {
       cv::namedWindow(windowName, 1);
-      cv::resizeWindow(windowName, 200,200);
+      cv::resizeWindow(windowName, 200, 200);
     }
 
     // optional: prepare serial port for communication with Arduino
@@ -368,7 +418,8 @@ public:
     // opening the device via OpenCV; confirmed to work with Logitech
     // C270; try exposure=20, gain=100, brightness=150
 
-    string video_str = "/dev/video0";
+    string video_str = "/dev/video0";    
+    
     video_str[10] = '0' + m_deviceId;
     int device = v4l2_open(video_str.c_str(), O_RDWR | O_NONBLOCK);
 
@@ -416,20 +467,13 @@ public:
     m_cap.set(CV_CAP_PROP_FRAME_WIDTH, m_width);
     m_cap.set(CV_CAP_PROP_FRAME_HEIGHT, m_height);
     cout << "Camera successfully opened (ignore error messages above...)" << endl;
-    //int codec = -1;CV_FOURCC('X','2','6','4');//(int)m_cap.get(CV_CAP_PROP_FOURCC);
-    //cout<<codec;
-    //outputVideo.open("/home/sumit/april/videos17/output.mp4",codec, m_cap.get(CV_CAP_PROP_FPS),cv::Size((int) m_cap.get(CV_CAP_PROP_FRAME_WIDTH), (int) m_cap.get(CV_CAP_PROP_FRAME_HEIGHT)),true);
-    /* if(!outputVideo.isOpened()) {
-      cerr << "ERROR: Can't find video device " << m_deviceId << "\n";
-      exit(1);
-    }*/
     cout << "Actual resolution: "
          << m_cap.get(CV_CAP_PROP_FRAME_WIDTH) << "x"
          << m_cap.get(CV_CAP_PROP_FRAME_HEIGHT) << endl;
 
     std::ofstream writefile;
     writefile.open(outputfile, std::ofstream::out);
-    if(m_frame)
+    if (m_frame)
       writefile << "frame id\t";
     writefile << "detection id\thamming distance\tdistance\tx\ty\tz\tyaw\tpitch\troll\n";
     writefile.close();
@@ -442,8 +486,8 @@ public:
 
     cout << "  Id: " << detection.id
          << " (Hamming: " << detection.hammingDistance << ")";
-    if(m_frame)
-      writefile << frame << 't';
+    if (m_frame)
+      writefile << frame << '\t';
     writefile << detection.id << '\t' << detection.hammingDistance << '\t';
 
     // recovering the relative pose of a tag:
@@ -480,6 +524,15 @@ public:
     // use reprojection error of corner points, because the noise in
     // this relative pose is very non-Gaussian; see iSAM source code
     // for suitable factors.
+  }
+
+  void processImages(list<cv::Mat *> &list)
+  {
+    cv::Mat image_gray;
+    for (auto i = list.begin(); i != list.end(); ++i)
+    {
+      processImage(**i, image_gray);
+    }
   }
 
   void processImage(cv::Mat &image, cv::Mat &image_gray, int frame = -1)
@@ -527,20 +580,20 @@ public:
         detections[i].draw(image);
       }
 
-    string text = to_string(frame);
-   
-    cv::Mat resized;
-    cv::putText(image, text, cv::Point(0, 1000), CV_FONT_HERSHEY_SIMPLEX, 5, CV_RGB(255, 0, 0), 10);
-    cv::resize(image, resized, cv::Size(960,720));
+      string text = to_string(frame);
 
-    imshow(windowName, resized); // OpenCV call
-                                //     cout<<"after draw";
-                                //     cout<<"hello!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
-                                //outputVideo << image;
-    char buff[100];
-    snprintf(buff, sizeof(buff), "../imgs/img%d.png", frame);
-    std::string buffAsStdStr = buff;
-    imwrite(buffAsStdStr, image);
+      cv::Mat resized;
+      cv::putText(image, text, cv::Point(0, 1000), CV_FONT_HERSHEY_SIMPLEX, 5, CV_RGB(255, 0, 0), 10);
+      cv::resize(image, resized, cv::Size(960, 720));
+
+      imshow(windowName, resized); // OpenCV call
+                                   //     cout<<"after draw";
+                                   //     cout<<"hello!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+                                   //outputVideo << image;
+      char buff[100];
+      snprintf(buff, sizeof(buff), "../imgs/img%d.png", frame);
+      std::string buffAsStdStr = buff;
+      imwrite(buffAsStdStr, image);
     }
 
     // optionally send tag information to serial port (e.g. to Arduino)
@@ -589,7 +642,12 @@ public:
   // Video or image processing?
   bool isVideo()
   {
-    return m_imgNames.empty();
+    return m_imgNames.empty() && in_folder.empty();
+  }
+
+  bool isFolder()
+  {
+    return !in_folder.empty();
   }
 
   // The processing loop where images are retrieved, tags detected,
@@ -666,6 +724,38 @@ int main(int argc, char *argv[])
 
     // the actual processing loop where tags are detected and visualized
     demo.loop();
+  }
+  else if (demo.isFolder())
+  {
+    cout << "Process all imgs in folder" << std::endl;
+
+    list<const char *> files_vec;
+    list<cv::Mat *> imgs;
+
+    demo.load_files(&files_vec);
+
+    cout << "Loaded all files" << std::endl;
+
+    for (auto i = files_vec.begin(); i != files_vec.end(); ++i)
+    {
+      string filename((*i));
+
+      cout << "Processing " << filename << std::endl;
+
+      cv::Mat img = cv::imread(filename);
+      cv::Mat *image = new cv::Mat(img);
+
+      imgs.push_back(image);
+
+      printf("%s\n", (*i));
+    }
+
+    demo.processImages(imgs);
+
+    for (auto i = files_vec.begin(); i != files_vec.end(); ++i)
+    {
+      delete (*i);
+    }
   }
   else
   {

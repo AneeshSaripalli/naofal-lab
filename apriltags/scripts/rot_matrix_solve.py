@@ -5,9 +5,7 @@ from numpy import subtract as sub
 from numpy.linalg import inv
 from scipy.spatial.transform import Rotation as R
 
-
-# Translation Homogenous Mapping
-
+# Translation Basis Definitions
 MAT_B1 = np.array([
     [2.22711,	-0.226531,	-0.0671484],
     [6.45367  ,  -3.57227,    0.0133328],
@@ -31,6 +29,7 @@ MAT_B2 = np.array([
     [5.64502  ,  -0.762065,    0.0183434],
     [7.31903  ,  -0.230759  ,  0.0504592]
 ]).T
+# End Basis Definitions 
 
 
 """
@@ -113,11 +112,11 @@ def calc_basis_change(orig_basis_1, trans_basis_1, orig_basis_2, trans_basis_2):
     road1_inv = inv(orig_basis_1)
     road2_inv = inv(orig_basis_2)
 
-    mat_translate_pre_mult = sub(mul(trans_basis_1, road1_inv), mul(trans_basis_2, road2_inv))
-    mat_translate = mul(mat_translate_pre_mult, inv(sub(road1_inv, road2_inv)))
+    mat_translate_pre_mult = trans_basis_1 @ road1_inv - trans_basis_2 @ road2_inv
+    mat_translate = mat_translate_pre_mult  @ inv(road1_inv - road2_inv)
 
-    ROT_APPRX_1 = sub(mul(trans_basis_1, road1_inv), mul(mat_translate, road1_inv))
-    ROT_APPRX_2 = sub(mul(trans_basis_2, road2_inv), mul(mat_translate, road2_inv))
+    ROT_APPRX_1 = trans_basis_1 @ road1_inv - mat_translate @ road1_inv
+    ROT_APPRX_2 = trans_basis_2 @ road2_inv - mat_translate @ road2_inv
     
     AVG = (ROT_APPRX_1 + ROT_APPRX_2) / 2
 
@@ -125,8 +124,14 @@ def calc_basis_change(orig_basis_1, trans_basis_1, orig_basis_2, trans_basis_2):
 
     return (AVG, mat_translate, diff)
 
-def main():
+def calc_trans_vec_from_mat(T):
+    x_avg = (T[0][0] + T[0][1] + T[0][2]) / 3.0
+    y_avg = (T[1][0] + T[1][1] + T[1][2]) / 3.0
+    z_avg = (T[2][0] + T[2][1] + T[2][2]) / 3.0
+    
+    return np.asarray((x_avg, y_avg, z_avg))
 
+def main():
     print(calc_basis_change(MAT_R1, MAT_B1, MAT_R2, MAT_B2))
 
 

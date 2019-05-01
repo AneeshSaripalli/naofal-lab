@@ -21,8 +21,6 @@ X = 0
 Y = 1
 Z = 2
 
-def write_to_face_data_file(fptr, write_str):
-    fptr.write(write_str)
 
 """
     ROW FORMAT for POSE_ALL
@@ -46,13 +44,13 @@ def main():
     VIS_FILE = sio.loadmat(args.visualize_output)
     ROAD_TO_BACK_FILE = open(args.road_to_back, 'r')
 
-    R2B = pd.read_csv(ROAD_TO_BACK_FILE, sep='\t') # transposing so we can iterate over (what were) rows rather of columns
+    R2B = pd.read_csv(ROAD_TO_BACK_FILE, sep='\t') # creating pandas dataframe from Road to Back CSV file
     
-    POSE_ALL = VIS_FILE.get(POSE_MATRIX_NAME)
+    POSE_ALL = VIS_FILE.get(POSE_MATRIX_NAME) # gettng head pose matrix from matlab file
 
-    face_csv_file = open("../output/face_data.csv", 'w+')
+    face_csv_file = open("../output/face_data.csv", 'w+') # opening output file for face csv data
 
-    offset = args.delta_back_minus_road
+    offset = args.delta_back_minus_road 
 
     b2f_rptr = 0
     r2b_rptr = 0
@@ -60,7 +58,7 @@ def main():
     b2f_len = len(POSE_ALL)
     r2b_len = len(R2B)
 
-    R2B = R2B.T
+    R2B = R2B.T # transposing so we can iterate over (what were) rows rather of columns
 
     if offset > 0:
         b2f_rptr = offset
@@ -69,31 +67,28 @@ def main():
 
 
     face_header = "faceX\tfaceY\tfaceZ\n"
-    write_to_face_data_file(face_csv_file, face_header)
+    face_csv_file.write(face_header)
 
     while b2f_rptr < b2f_len and r2b_rptr < r2b_len:
         if R2B[r2b_rptr]['frameId'] == 2222:
             faceX = 2222
             faceY = 2222
             faceZ = 2222
+            print('Frame is 2222')
         else:
             faceX = float(POSE_ALL[b2f_rptr][X]) + R2B[r2b_rptr]['projX']
             faceY = float(POSE_ALL[b2f_rptr][Y]) + R2B[r2b_rptr]['projY']
             faceZ = float(POSE_ALL[b2f_rptr][Z]) + R2B[r2b_rptr]['projZ']
-        
+            print('Frame is valid')
         face_data = (faceX, faceY, faceZ)
 
         face_str = str(faceX) + "\t" + str(faceY) + "\t" + str(faceZ) + "\n"
-        write_to_face_data_file(face_csv_file, face_str)
+        face_csv_file.write(face_str)
 
 
         b2f_rptr = b2f_rptr+1
         r2b_rptr = r2b_rptr+1
     
-
-def testr2breader(r2breader):
-    for row in r2breader:
-        print(row[0])
 
 if __name__ == '__main__':
     main()

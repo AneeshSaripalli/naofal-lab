@@ -17,6 +17,7 @@ import argparse
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+
 f_cam = 1000
 n_tags = 23
 no_subj=1
@@ -30,11 +31,13 @@ args = parser.parse_args()
 
 CSV_FILE = args.csv_file
 
+TAG_ID_INDEX = 1
+NULL_MARKER = 2222
+FRAME_INDEX = 0
 
-
-#plane_all = sio.loadmat('../plane_subj.mat')['plane_all']
 for i in np.array([1]):#files in os.listdir(path_loc):
-    file_path = CSV_FILE
+    file_path = args.csv_file #path_loc + files
+    print(file_path)
     f = open(file_path)
     csv_f = csv.reader(f,delimiter='\t')
     
@@ -43,15 +46,12 @@ for i in np.array([1]):#files in os.listdir(path_loc):
     full_array = new_frame.copy();  
     count = -1
     for row in csv_f:
-        if (count==39554):
-            break
+        row = row[1:]
         if (count == -1):
-            count = count+1
-            #print('1111111')
-        elif (row[1]=='2222'):
-           # print('2222222')
-            full_array = np.append(full_array, new_frame, axis=2)
             count = count+1;
+        elif (row[1]==str(NULL_MARKER)):
+            full_array = np.append(full_array, new_frame, axis=2)
+            count = count+1
         else:
             if (int(row[0]) < 23):
                 read_array = np.asarray(row[2:]).astype(np.float)

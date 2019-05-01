@@ -1,5 +1,6 @@
 import csv
 import argparse
+import rot_matrix_solve as d_basis
 import numpy as np
 
 # Translation Basis Definitions
@@ -64,13 +65,23 @@ def extract_pos_from_csv(road_csv_row):
 """
     road_csv_row: array |   Single non-header row from AprilTag road camera output
         Interest specifically in (x, y, z) data contained in said row
-    proj_vec: 3-tuple   | Calibration vector (projX, projY, projZ) defined s.t. 
-        <Calibration road vec> + <Proj vec> = <Calibration back vec>   
+    R: 3x3 rotation matrix (np.array)   |   Rotation matrix used to rotate road coordinate space
+        into back coordinate space (it's unlikely that the cameras will be oriented the same)
+    T: 3-tuple   |  Translate vector used to move between origin of road and back coordinate spaces
+        
+    R & T are defined in this transformation
+
+    road coordinate space -> transformed by [R | T] -> back coordinate space
+
+    Mathematically, R * road + [T T T T ...] = back 
+        where road and back are 3xN matrices and the transform matrix consists of N columns of T
 """
 def get_r2b_proj_pos(road_csv_row, R, T):
-    road_pos = extract_pos_from_csv(road_csv_row)
-    return (road_pos[0] + proj_vec[0], road_pos[1] + proj_vec[1], road_pos[2] + proj_vec[2])
+    road_pos = np.asarray(extract_pos_from_csv(road_csv_row))
 
+    back_pos_no_translate = np.matmul(R, road_pos)
+
+    return back_pos_no_translate + T
 '''
     r2b_csv_file: file handle |     File handle on the output data file to pipe the projected road vector positions to
     r2b_vec:    3-tuple |   (back ^x, back ^y, back ^z) projection calculated by <back ^vec> = <road csv vec> + <proj vec>  
@@ -83,6 +94,7 @@ def magnitude(vector):
 
 def write_header(r2b_proj_csv_file):
     r2b_proj_csv_file.write('frameId' + '\t' + 'detectionId' + '\t' + 'distance' + '\t' + 'projX' + '\t' 'projY' + '\t' + 'projZ' + '\n')
+
 
 def main():
     parser = define_arguments() # Gets the parser object after initializing the required parameters
@@ -98,6 +110,15 @@ def main():
 
     write_header(r2b_proj_csv_file)
 
+    (R, T, _) = d_basis.calc_basis_change(MAT_R1, MAT_B1, MAT_R2, MAT_B2)
+    trans_vec = d_basis.calc_trans_vec_from_mat(T)
+
+    print("Yielded Rotation")
+    print(R)
+
+    print("Yielded Translation")
+    print(trans_vec)
+
     with open(road_csv_path, 'r') as road_csv:
         csv_reader = csv.reader(road_csv, delimiter='\t')
         next(csv_reader, None)  # Skips the header row of the CSV file
@@ -107,7 +128,7 @@ def main():
             if frameId == NULL_MARKER:  # Checks if the row is a frame terminator row 
                 write_to_r2b_file(r2b_proj_csv_file, frameId, detectionId, 2222, (NULL_MARKER, NULL_MARKER, NULL_MARKER))
             else:
-                r2b_proj_vec = get_r2b_proj_pos(row, proj_vec)
+                r2b_proj_vec = get_r2b_proj_pos(row, R, trans_vec)
                 write_to_r2b_file(r2b_proj_csv_file, frameId, detectionId, magnitude(r2b_proj_vec), r2b_proj_vec)
 
 if __name__ == '__main__':

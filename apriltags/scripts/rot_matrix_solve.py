@@ -8,28 +8,28 @@ from scipy.spatial.transform import Rotation as R
 # Translation Basis Definitions
 MAT_B1 = np.array([
     [2.22711,	-0.226531,	-0.0671484],
-    [6.45367  ,  -3.57227,    0.0133328],
-    [3.50909  ,  -2.01472   , -0.0777887]
+    [6.45367,  -3.57227,    0.0133328],
+    [3.50909,  -2.01472, -0.0777887]
 ]).T
 
 MAT_R1 = np.array([
-    [0.901928 ,   0.23471,    0.121155],
-    [5.50031 ,   -2.74337,    0.381287],
-    [2.3099     ,  -1.40638 ,   0.134852]
+    [0.901928,   0.23471,    0.121155],
+    [5.50031,   -2.74337,    0.381287],
+    [2.3099,  -1.40638,   0.134852]
 ]).T
 
 MAT_R2 = np.array([
-    [1.38289   , 0.205411 ,   0.186091],
-    [4.36434 ,   -0.0080363 ,   0.432257],
-    [6.31585  ,  0.684121   , 0.626229]
+    [1.38289, 0.205411,   0.186091],
+    [4.36434,   -0.0080363,   0.432257],
+    [6.31585,  0.684121, 0.626229]
 ]).T
 
 MAT_B2 = np.array([
-    [2.72829 ,   -0.283092,    -0.0316143],
-    [5.64502  ,  -0.762065,    0.0183434],
-    [7.31903  ,  -0.230759  ,  0.0504592]
+    [2.72829,   -0.283092,    -0.0316143],
+    [5.64502,  -0.762065,    0.0183434],
+    [7.31903,  -0.230759,  0.0504592]
 ]).T
-# End Basis Definitions 
+# End Basis Definitions
 
 
 """
@@ -108,6 +108,8 @@ MAT_B2 = np.array([
 
     This function returns (AVG, T, Diff)
 """
+
+
 def calc_basis_change(orig_basis_1, trans_basis_1, orig_basis_2, trans_basis_2):
     road1_inv = inv(orig_basis_1)
     road2_inv = inv(orig_basis_2)
@@ -117,19 +119,21 @@ def calc_basis_change(orig_basis_1, trans_basis_1, orig_basis_2, trans_basis_2):
 
     ROT_APPRX_1 = trans_basis_1 @ road1_inv - mat_translate @ road1_inv
     ROT_APPRX_2 = trans_basis_2 @ road2_inv - mat_translate @ road2_inv
-    
+
     AVG = (ROT_APPRX_1 + ROT_APPRX_2) / 2
 
     diff = ROT_APPRX_1 - ROT_APPRX_2
 
     return (AVG, mat_translate, diff)
 
+
 def calc_trans_vec_from_mat(T):
     x_avg = (T[0][0] + T[0][1] + T[0][2]) / 3.0
     y_avg = (T[1][0] + T[1][1] + T[1][2]) / 3.0
     z_avg = (T[2][0] + T[2][1] + T[2][2]) / 3.0
-    
+
     return np.asarray((x_avg, y_avg, z_avg))
+
 
 def main():
     print(calc_basis_change(MAT_R1, MAT_B1, MAT_R2, MAT_B2))

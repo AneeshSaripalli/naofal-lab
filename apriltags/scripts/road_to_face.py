@@ -10,7 +10,7 @@ POSE_MATRIX_NAME = "pose_all"
 def get_cmd_line_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("visualize_output", help="Output .mat file path from the visualize.py script", type=str)
-    parser.add_argument("road_to_back", help="Output .csv file path from the move_road_to_back script", type=str)
+    parser.add_argument("road_to_back_normalized", help="Output .csv file path from the move_road_to_back script", type=str)
     parser.add_argument("delta_back_minus_road", help="Frame offset back_sync - road_sync.\
                                                     Ex: if back and road are synced in the CSV files at frame 48 and 34, respectively"\
                                                     "Input 48-34 = 14 frame offset", type=int)
@@ -46,14 +46,8 @@ def get_road_data(POSE_ALL, R2B, offset, face_csv_file):
     vis_frames = len(POSE_ALL)
     road_rows = len(R2B)
 
-
-    print("Visualize frames")
-    print(POSE_ALL)
-    print("ROAD TO BACK")
-    print(R2B)
-
-    print("Visualize Frames", vis_frames)
-    print("Road Rows", road_rows)
+    print("Total Center of Mass Frames", vis_frames)
+    print("Total # of lines of Road Data", road_rows)
 
     R2B = R2B.T # transposing so we can iterate over (what were) rows rather of columns
     POSE_ALL = POSE_ALL.T
@@ -66,7 +60,11 @@ def get_road_data(POSE_ALL, R2B, offset, face_csv_file):
     elif offset < 0: # road data starts before back video
         # need to move row pointer ahead in road_to_back data to sync with visualize
         print("need to move road row ptr")
-        while int(R2B[road_row_ptr]['frame id']) != offset:
+        frame_counter = 0
+        while frame_counter != -offset:
+            if str(R2B[road_row_ptr]['frameId']) == "nan" or int(R2B[road_row_ptr]['frameId']) == 2222:
+                print("New frame")
+                frame_counter = frame_counter + 1
             road_row_ptr = road_row_ptr + 1
 
     face_header = "frame id\tfaceX\tfaceY\tfaceZ\n"
@@ -75,12 +73,27 @@ def get_road_data(POSE_ALL, R2B, offset, face_csv_file):
     # doing frame by frame syncing
     print("Vis Frame %d, Road Row Ptr %d" % (vis_row_ptr, road_row_ptr))
 
+    while vis_row_ptr < vis_frames and road_row_ptr < road_rows:
+        vis_row = POSE_ALL[vis_row_ptr]
+        road_row = R2B[road_row_ptr]
 
+        curr_frame = road_row['frameId']
 
+        print(vis_row)
+        print(road_row)
+        print('\n')
+
+        vis_row_ptr = vis_row_ptr + 1
+
+        while R2B[road_row_ptr]['frameId'] == curr_frame:
+            road_row_ptr = road_row_ptr + 1
+        
+        road_row_ptr + 1
+ 
 def main():
     args = get_cmd_line_args()
 
-    ROAD_TO_BACK_FILE = open(args.road_to_back, 'r')
+    ROAD_TO_BACK_FILE = open(args.road_to_back_normalized, 'r')
     VISUALIZE = open(args.visualize_output, 'r')
 
     R2B = pd.read_csv(ROAD_TO_BACK_FILE, sep='\t') # creating pandas dataframe from Road to Back CSV file

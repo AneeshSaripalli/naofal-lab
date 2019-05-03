@@ -18,7 +18,10 @@ def normalize_road(r2b_file_path, apriltag_id):
     last_frame = -1
     row_counter = 0
 
-    null_row = "nan	nan	nan	1.0	0.0	0.0	0.0"
+    header = "frameId\tdetectionId\tdistance\tprojX\tprojY\tprojZ\n"
+    csv_output.write(header)
+
+    null_row = "nan	0.0	0.0	0.0	0.0"
 
     while row_counter < rows:
         row = df_r2b[row_counter]

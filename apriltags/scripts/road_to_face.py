@@ -9,11 +9,11 @@ POSE_MATRIX_NAME = "pose_all"
 
 def get_cmd_line_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("visualize_output", help="Output .mat file path from the visualize.py script", type=str)
-    parser.add_argument("road_to_back_normalized", help="Output .csv file path from the move_road_to_back script", type=str)
+    parser.add_argument("visualize_output", help="Path of output from visualize_frames.py", type=str)
+    parser.add_argument("road_to_back_normalized", help="Path of output from normalize_road.py", type=str)
     parser.add_argument("delta_back_minus_road", help="Frame offset back_sync - road_sync.\
-                                                    Ex: if back and road are synced in the CSV files at frame 48 and 34, respectively"\
-                                                    "Input 48-34 = 14 frame offset", type=int)
+                                                    Ex: if back and road are synced in the CSV files at frame 48 and 34, respectively\
+                                                    Input 48-34 = 14 frame offset", type=int)
 
     args = parser.parse_args()
     return args
@@ -44,10 +44,10 @@ def get_road_data(POSE_ALL, R2B, offset, face_csv_file):
     road_row_ptr = 0
 
     vis_frames = len(POSE_ALL)
-    road_rows = len(R2B)
+    road_frames = len(R2B)
 
     print("Total Center of Mass Frames", vis_frames)
-    print("Total # of lines of Road Data", road_rows)
+    print("Total # of lines of Road Data", road_frames)
 
     R2B = R2B.T # transposing so we can iterate over (what were) rows rather of columns
     POSE_ALL = POSE_ALL.T
@@ -60,12 +60,7 @@ def get_road_data(POSE_ALL, R2B, offset, face_csv_file):
     elif offset < 0: # road data starts before back video
         # need to move row pointer ahead in road_to_back data to sync with visualize
         print("need to move road row ptr")
-        frame_counter = 0
-        while frame_counter != -offset:
-            if str(R2B[road_row_ptr]['frameId']) == "nan" or int(R2B[road_row_ptr]['frameId']) == 2222:
-                print("New frame")
-                frame_counter = frame_counter + 1
-            road_row_ptr = road_row_ptr + 1
+        road_row_ptr = offset
 
     face_header = "frame id\tfaceX\tfaceY\tfaceZ\n"
     face_csv_file.write(face_header)
@@ -73,22 +68,28 @@ def get_road_data(POSE_ALL, R2B, offset, face_csv_file):
     # doing frame by frame syncing
     print("Vis Frame %d, Road Row Ptr %d" % (vis_row_ptr, road_row_ptr))
 
-    while vis_row_ptr < vis_frames and road_row_ptr < road_rows:
+    while vis_row_ptr < vis_frames and road_row_ptr < road_frames:
         vis_row = POSE_ALL[vis_row_ptr]
         road_row = R2B[road_row_ptr]
 
-        curr_frame = road_row['frameId']
-
-        print(vis_row)
-        print(road_row)
-        print('\n')
-
-        vis_row_ptr = vis_row_ptr + 1
-
-        while R2B[road_row_ptr]['frameId'] == curr_frame:
-            road_row_ptr = road_row_ptr + 1
+        road_f = road_row['frameId']
+        vis_f = vis_row['frame id']
         
-        road_row_ptr + 1
+        if str(road_row['detectionId']) == str(np.nan) or str(vis_row['x']) == str(np.nan):
+            row = "%d\t%s\t%s\t%s\n" % (int(vis_f), "nan", "nan", "nan") 
+            face_csv_file.write(row)
+        else:
+            road_trans = np.asarray((road_row['projX'], road_row['projY'], road_row['projZ']))
+            vis_trans = np.asarray((vis_row['x'], vis_row['y'], vis_row['z']))
+
+            face_to_april = road_trans - vis_trans
+
+            row = "%d\t%f\t%f\t%f\n" % (int(vis_f), face_to_april[0], face_to_april[1], face_to_april[2]) 
+            face_csv_file.write(row)
+
+        road_row_ptr = road_row_ptr + 1
+        vis_row_ptr = vis_row_ptr + 1
+    face_csv_file.close()
  
 def main():
     args = get_cmd_line_args()
@@ -103,7 +104,7 @@ def main():
 
     offset = args.delta_back_minus_road 
 
-    print("Syncing %s and %s with purported offset %d" % (args.road_to_back, args.visualize_output, offset))
+    print("Syncing %s and %s with purported offset %d" % (args.road_to_back_normalized, args.visualize_output, offset))
 
     get_road_data(POSE_ALL, R2B, offset, face_csv_file)
     

@@ -1,5 +1,5 @@
 # Overview
-## Project Structure
+## File Structure
 ```
 .
 +-  _AprilTag
@@ -25,6 +25,15 @@ back data
 |   +-- mesh_calib.npy              # calibration file required for Visualize_2.py to work properly
 |   +-- rotation_functions.py       # library module for rotation calculations in Visualize_2
 ```
+## Script Pipeline
+Calling run.sh in `AprilTags/` will do the following things.
+  1) `AprilTag` on the road facing video and back facing video -> `output/road.csv`, `output/back.csv` - this will take a very long time
+  2) Run `scripts/move_road_to_back.py` -> `output/road_proj_to_back.csv`
+  3) Run `visualize_2/Visualize_2.py` on `back.csv` -> `visualize_2/meshsave_back_2.mat`
+  4) Run `scripts/standardize_visualize.py` on `meshsave_back_2.mat` -> `output/visualize_frames.csv` 
+  5) Run `scripts/standarize_road.py` on `road.csv` -> `road_normalized.csv`
+  6) Run `scripts/road_to_face.py` on `visualize_frames.csv` & `road_normalized.csv` and the frame offset -> `face_data.csv`
+  7) `NOT DONE` Run `scripts/extract_face_frames.py` -> labelled face images in `imgs/*`
 
 ## AprilTags library
 

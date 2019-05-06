@@ -33,6 +33,8 @@ optional -d disables graphics
 ./build/bin/apriltags_demo -F 1080 -W 1920 -H 1080 -S 0.176 -I /home/aneesh/Desktop/shared/drive_data/road_clip.mp4 -O ../output/ROAD_CLEAR.csv -f
 
 
+./build/bin/apriltags_demo -F 1080 -W 1920 -H 1080 -S 0.176 -I <apriltag video> -O <output csv file> -d -f
+
 
 # road data sync frame
 34	100	0	4.22841	4.0845	0.752041	0.794184	0.102937	-0.253464	0.127004

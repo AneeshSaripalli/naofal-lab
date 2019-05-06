@@ -19,7 +19,7 @@ def get_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("back", help="Back CSV file", type=str)
-    parser.add_argument('visualize', help='Visualize.py Outpt file', type=str)
+    parser.add_argument('visualize', help='Visualize.py Output file', type=str)
 
     return parser.parse_args()
 
@@ -70,7 +70,7 @@ def sync_back_and_visualize(visualize_path, back_path, visualize_frames):
 def main():
     args = get_args()
 
-    visualize_frames = open('../../output/visualize_frames.csv', 'w+')
+    visualize_frames = open('output/visualize_frames.csv', 'w+')
     sync_back_and_visualize(args.visualize, args.back, visualize_frames)
     
 if __name__ == '__main__':

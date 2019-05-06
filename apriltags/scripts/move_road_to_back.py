@@ -38,7 +38,7 @@ Z_POS = X_POS + 2
 
 NULL_MARKER = 2222
 
-R2B_OUTPUT_FILE = '../../output/road_proj_to_back.csv'
+R2B_OUTPUT_FILE = 'output/road_proj_to_back.csv'
 
 '''
     Usage:

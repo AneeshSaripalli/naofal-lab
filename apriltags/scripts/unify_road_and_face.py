@@ -78,7 +78,7 @@ def get_road_data(POSE_ALL, R2B, offset, face_csv_file):
     elif offset < 0: # road data starts before back video
         # need to move row pointer ahead in road_to_back data to sync with visualize
         print("need to move road row ptr")
-        road_row_ptr = offset
+        road_row_ptr = -offset
 
     face_header = "frame id\tfaceX\tfaceY\tfaceZ\tcomX\tcomY\tcomZ\tr\tphi\ttheta\n"
     face_csv_file.write(face_header)

@@ -13,6 +13,8 @@ OP_R2B="output/road_proj_to_back.csv"
 OP_FACE="output/face_data.csv"
 OP_VIS="visualize_2/meshsave_back_2.mat"
 
+FACE_IMGS="face_imgs"
+
 echo "Back video file is:   $1"
 echo "Road video file is:   $2"
 echo "Road back offset is:  $3"
@@ -36,20 +38,24 @@ echo "Calculating center of mass. Output to $OP_VIS"
 cd ..
 
 echo "Projecting road distance vectors to the back camera using the sync frames defined in move_back_to_road.py. Output to $OP_R2B"
-python3 apriltags/scripts/move_road_to_back.py $AP_ROAD &
+#python3 apriltags/scripts/move_road_to_back.py $AP_ROAD &
 
 wait
 
 echo "Standardizing visualize_2 output by writing pose_all matrix from meshsave to a csv file & adding a frame column"
-python3 apriltags/scripts/standardize_visualize.py    $AP_BACK $OP_VIS &
+#python3 apriltags/scripts/standardize_visualize.py    $AP_BACK $OP_VIS &
 
 echo "Standardizing $OP_R2B by considering only AprilTag marker frames and changing file schema"
-python3 apriltags/scripts/standardize_road.py         $OP_R2B      $6 &
+#python3 apriltags/scripts/standardize_road.py         $OP_R2B      $6 &
 
 wait
 
 echo "Extracting viable face frames by combining visualize_frames.csv & road_normalized.csv"
-python3 apriltags/scripts/road_to_face.py      $STD_VIS     $STD_ROAD  $3
+#python3 apriltags/scripts/unify_road_and_face.py      $STD_VIS     $STD_ROAD  $3
 
-## back-face=-1704, back-road=1144
+if [ ! -d $FACE_IMGS ]; then
+    mkdir face_imgs
+fi
+
+python3 apriltags/scripts/extract_face_frames.py $4 $OP_FACE $5 $3
 

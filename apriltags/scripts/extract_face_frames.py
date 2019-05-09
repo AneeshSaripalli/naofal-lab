@@ -47,7 +47,7 @@ def print_imgs(video_path, face_offset, road_offset, csv_data):
             print("Hit last frame in CSV")
             break
         if face_data_index >= 0 and str(face[face_data_index]['faceX']) != 'nan':
-            cv2.imwrite("imgs/face_b%d_f%d.png" % (back_index, face_index), image)
+            cv2.imwrite("imgs/face_b%d_f%d.png" % (back_index, face_index), image)  # writes captured image to imgs/ MOHAMED
             print("Printing frame %d (road) | %d (back) | %d (face)" % (road_index, back_index, face_index))
             print('Combined data line:', face[face_data_index])
         else:

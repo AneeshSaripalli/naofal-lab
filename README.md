@@ -25,7 +25,8 @@
 |   +-- AprilTag_Road.csv           # AprilTag (road cam) will create [AprilTag]
 |   +-- road_proj_to_back.csv       # Road cam data => back cam [move_road_to_back.py]
 |   +-- road_normalized.csv         # road_proj data to look like visualize_2 data [std_road.py]
-|   +-- visualize_frames.csv        # Visualize_2 output with frame count added [std_vis.py] 
+|   +-- visualize_frames.csv        # Visualize_2 output with frame count added [std_vis.py]
+|   +-- face_data.csv               # final output from run.sh
 +-- _visualize_2
 |   +-- Visualize_2.py              # script to calculate center of mass from back data
 |   +-- mesh_calib.npy              # calibration file required for Visualize_2.py to work properly

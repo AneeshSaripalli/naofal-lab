@@ -97,14 +97,14 @@ def get_road_data(POSE_ALL, R2B, offset, face_csv_file):
             face_csv_file.write(row)
         else:
             road_trans = np.asarray((road_row['projX'], road_row['projY'], road_row['projZ']))
-            vis_trans = np.asarray((vis_row['x'], vis_row['y'], vis_row['z']))
+            vis_trans = np.asarray((-vis_row['z'], -vis_row['x'], vis_row['y'])) # transforming OpenGL coordinates from visualize_2 script to ApriLTag coordinate system
 
             face_to_april = road_trans - vis_trans
 
             sph = calc_spherical(face_to_april)
 
             row = "%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (int(vis_f), face_to_april[0], face_to_april[1], face_to_april[2], 
-                vis_row['x'], vis_row['y'], vis_row['z'], sph[0], sph[1], sph[2]) 
+                -vis_row['z'], -vis_row['x'], vis_row['y'], sph[0], sph[1], sph[2]) 
             face_csv_file.write(row)
 
         road_row_ptr = road_row_ptr + 1

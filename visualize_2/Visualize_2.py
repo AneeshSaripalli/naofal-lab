@@ -33,12 +33,6 @@ import rotation_functions as rf
 """
 
 
-f_cam = 1000
-n_tags = 23
-no_subj = 1
-pose_all = np.empty((no_subj), dtype=object)
-mesh_all = np.empty((no_subj), dtype=object)
-suct = 0
 
 NULL_MARKER = 2222
 
@@ -56,7 +50,14 @@ def main():
     process_back_data(back_csv_path)
 
 
-def process_back_data(file):
+def process_back_data(file):    
+    f_cam = 1000
+    n_tags = 23
+    no_subj = 1
+    pose_all = np.empty((no_subj), dtype=object)
+    mesh_all = np.empty((no_subj), dtype=object)
+    suct = 0
+    
     print('Calculating center of mass on file', file)
     for i in np.array([1]):  # files in os.listdir(path_loc):
         file_path = file

@@ -6,8 +6,9 @@ import numpy as np
 import rot_matrix_solve as d_basis
 
 # Translation Basis Definitions
+# All sync positions are defined row wise (x, y, z)
 MAT_B1 = np.array([
-    [2.22711,	-0.226531,	-0.0671484],
+    [2.22711,	-0.226531,	-0.0671484], # x = 2.22711, y = -.226531, z = -.-0671484...
     [6.45367,  -3.57227,    0.0133328],
     [3.50909,  -2.01472, -0.0777887]
 ]).T

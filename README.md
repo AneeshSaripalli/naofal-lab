@@ -7,9 +7,11 @@
 |   +-- _example
 |   +-- _scripts                    # home directory for the python script pipeline
 |       +-- move_road_to_back.py
-|       +-- normalize_road.py
-|       +-- process_visualize.py    # adds a frame count to the matlab output from visualize -> .csv
+|       +-- standardize_road.py
+|       +-- standardize_visualize.py    # adds a frame count to the matlab output from visualize
 |       +-- rot_matrix.solve.py     # attempts to solve for calibration between road & back cams
+        +-- unify_road_and_face.py  # uses data from both road & face to get COM to AprilTag & spherical coords
+        +-- extract_faces_frames.py # uses output from unify... & face video to extract labelled frames
 |   +-- Makefile                    # run make in apriltags/ to build the AprilTag library
 |   +-- CMakeLists.txt              # CMake is called in the make process to build the C++ exe
 +-- _output                         # write & defacto read folder for data in the python scripts
@@ -19,21 +21,26 @@
 |   +--_TIANJING DRIVING
 |       +-- ROAD_CLEAR_2.csv
 |       +-- BACK_CLEAR_2.csv
-+-- visualize_2
-|   +-- Visualize_2.py              # python script to calculate center of mass from 
-back data
+|   +-- AprilTag_Back.csv           # AprilTag (back cam) will create [ AprilTag]
+|   +-- AprilTag_Road.csv           # AprilTag (road cam) will create [AprilTag]
+|   +-- road_proj_to_back.csv       # Road cam data => back cam [move_road_to_back.py]
+|   +-- road_normalized.csv         # road_proj data to look like visualize_2 data [std_road.py]
+|   +-- visualize_frames.csv        # Visualize_2 output with frame count added [std_vis.py] 
++-- _visualize_2
+|   +-- Visualize_2.py              # script to calculate center of mass from back data
 |   +-- mesh_calib.npy              # calibration file required for Visualize_2.py to work properly
 |   +-- rotation_functions.py       # library module for rotation calculations in Visualize_2
+++- run.sh                          # master pipeline, will output labelled face images 
 ```
 ## Script Pipeline
-Calling run.sh in `AprilTags/` will do the following things.
-  1) `AprilTag` on the road facing video and back facing video -> `output/road.csv`, `output/back.csv` - this will take a very long time
-  2) Run `scripts/move_road_to_back.py` -> `output/road_proj_to_back.csv`
+Running `AprilTags/run.sh` will do the following things.
+  1) Run the `AprilTag` software (`./apriltags/build/bin/apriltags_demo`) on the road facing video and back facing video in parallel -> `output/road.csv`, `output/back.csv` - expect this to take a very long time (10+ hour)
+  2) NOTE: Please change the sync vectors in `scripts/move_road_to_back.py` before running this. Run `scripts/move_road_to_back.py` using `output/road.csv` -> `output/road_proj_to_back.csv`
   3) Run `visualize_2/Visualize_2.py` on `back.csv` -> `visualize_2/meshsave_back_2.mat`
   4) Run `scripts/standardize_visualize.py` on `meshsave_back_2.mat` -> `output/visualize_frames.csv` 
   5) Run `scripts/standarize_road.py` on `road.csv` -> `road_normalized.csv`
   6) Run `scripts/road_to_face.py` on `visualize_frames.csv` & `road_normalized.csv` and the frame offset -> `face_data.csv`
-  7) `NOT DONE` Run `scripts/extract_face_frames.py` -> labelled face images in `imgs/*`
+  7) Run `scripts/extract_face_frames.py` -> labelled face images in `imgs/*`
 
 ## AprilTags library
 

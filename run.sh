@@ -13,7 +13,7 @@ OP_R2B="output/road_proj_to_back.csv"
 OP_FACE="output/face_data.csv"
 OP_VIS="visualize_2/meshsave_back_2.mat"
 
-FACE_IMGS="face_imgs"
+FACE_IMGS="imgs"
 
 echo "Back video file is:   $1"
 echo "Road video file is:   $2"
@@ -54,7 +54,7 @@ echo "Extracting viable face frames by combining visualize_frames.csv & road_nor
 #python3 apriltags/scripts/unify_road_and_face.py      $STD_VIS     $STD_ROAD  $3
 
 if [ ! -d $FACE_IMGS ]; then
-    mkdir face_imgs
+    mkdir $FACE_IMGS
 fi
 
 python3 apriltags/scripts/extract_face_frames.py $4 $OP_FACE $5 $3

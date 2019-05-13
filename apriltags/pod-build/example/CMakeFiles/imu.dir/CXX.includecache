@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/marzban/calibrateCameras/naofal-lab/apriltags/example/Serial.cpp
+fcntl.h
+-
+termios.h
+-
+stdlib.h
+-
+iostream
+-
+sstream
+-
+unistd.h
+-
+Serial.h
+/home/marzban/calibrateCameras/naofal-lab/apriltags/example/Serial.h
+
+/home/marzban/calibrateCameras/naofal-lab/apriltags/example/Serial.h
+string
+-
+
+/home/marzban/calibrateCameras/naofal-lab/apriltags/example/imu.cpp
+iostream
+-
+string
+-
+stdio.h
+-
+math.h
+-
+Serial.h
+/home/marzban/calibrateCameras/naofal-lab/apriltags/example/Serial.h
+

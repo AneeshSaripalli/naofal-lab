@@ -1,9 +1,4 @@
 build/
-cmake/
-pod-build/
-back_imgs/
-road_imgs/
-apriltags/.svn/*
-.vscode
+img/*
 *.mp4
-imgs/
+apriltags/.svn

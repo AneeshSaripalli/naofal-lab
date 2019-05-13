@@ -1,0 +1,16 @@
+/home/marzban/calibrateCameras/naofal-lab/apriltags/pod-build/CMakeFiles/install/strip.dir
+/home/marzban/calibrateCameras/naofal-lab/apriltags/pod-build/CMakeFiles/install/local.dir
+/home/marzban/calibrateCameras/naofal-lab/apriltags/pod-build/CMakeFiles/apriltags.dir
+/home/marzban/calibrateCameras/naofal-lab/apriltags/pod-build/CMakeFiles/edit_cache.dir
+/home/marzban/calibrateCameras/naofal-lab/apriltags/pod-build/CMakeFiles/list_install_components.dir
+/home/marzban/calibrateCameras/naofal-lab/apriltags/pod-build/CMakeFiles/rebuild_cache.dir
+/home/marzban/calibrateCameras/naofal-lab/apriltags/pod-build/CMakeFiles/tmp.dir
+/home/marzban/calibrateCameras/naofal-lab/apriltags/pod-build/CMakeFiles/install.dir
+/home/marzban/calibrateCameras/naofal-lab/apriltags/pod-build/example/CMakeFiles/install/strip.dir
+/home/marzban/calibrateCameras/naofal-lab/apriltags/pod-build/example/CMakeFiles/install/local.dir
+/home/marzban/calibrateCameras/naofal-lab/apriltags/pod-build/example/CMakeFiles/imu.dir
+/home/marzban/calibrateCameras/naofal-lab/apriltags/pod-build/example/CMakeFiles/list_install_components.dir
+/home/marzban/calibrateCameras/naofal-lab/apriltags/pod-build/example/CMakeFiles/edit_cache.dir
+/home/marzban/calibrateCameras/naofal-lab/apriltags/pod-build/example/CMakeFiles/apriltags_demo.dir
+/home/marzban/calibrateCameras/naofal-lab/apriltags/pod-build/example/CMakeFiles/rebuild_cache.dir
+/home/marzban/calibrateCameras/naofal-lab/apriltags/pod-build/example/CMakeFiles/install.dir

@@ -355,13 +355,12 @@ public:
     }
   }
 
-
-int is_regular_file(const char *path)
-{
+  int is_regular_file(const char *path)
+  {
     struct stat path_stat;
     stat(path, &path_stat);
     return S_ISREG(path_stat.st_mode);
-}
+  }
 
   void load_files(list<const char *> *files)
   {
@@ -380,9 +379,10 @@ int is_regular_file(const char *path)
     {
       // printf("%s\n", dp->d_name);
 
-      const char* file_name = dp->d_name;
+      const char *file_name = dp->d_name;
 
-      if(!strcmp(file_name, ".") || !strcmp(file_name, "..")) continue;
+      if (!strcmp(file_name, ".") || !strcmp(file_name, ".."))
+        continue;
 
       if (files)
         files->push_back(dp->d_name);
@@ -418,8 +418,8 @@ int is_regular_file(const char *path)
     // opening the device via OpenCV; confirmed to work with Logitech
     // C270; try exposure=20, gain=100, brightness=150
 
-    string video_str = "/dev/video0";    
-    
+    string video_str = "/dev/video0";
+
     video_str[10] = '0' + m_deviceId;
     int device = v4l2_open(video_str.c_str(), O_RDWR | O_NONBLOCK);
 

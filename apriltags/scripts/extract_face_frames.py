@@ -1,49 +1,59 @@
 import argparse
 import cv2
 import csv
+import pandas as pd
 
-def define_arguments():
+def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("face_video_path",      help="Face Video Path", type=str)
-    parser.add_argument("face_video_offset",    help="Data CSV frame offset. This will be the same as the start frame of the back camera data stream.", type=int)
     parser.add_argument("face_csv_data",        help="Data CSV File", type=str)
-    return parser
+    parser.add_argument("face_video_offset",    help="Video sync offset back - face. This will be the same as the start frame of the back camera data stream.", type=int)
+    parser.add_argument("road_video_offset",    help="Video sync offset back - road", type=int)
+
+    return parser.parse_args()
 
 def open_csv(face_csv_path):
     face_csv = open(face_csv_path, 'r')
     return csv.reader(face_csv, delimiter='\t')
 
 def main():
-    parser = define_arguments()
-    args = parser.parse_args()
+    args = get_args()
+    
+    print_imgs(args.face_video_path, args.face_video_offset, args.road_video_offset, args.face_csv_data)
 
-    print_imgs(args.face_video_path, args.face_video_offset, args.face_csv_data)
-    print(args)
-
-def print_imgs(video_path, csv_offset, csv_data):
+def print_imgs(video_path, face_offset, road_offset, csv_data):
     video = cv2.VideoCapture(video_path)
 
-    face = open_csv(csv_data)
+    face = pd.read_csv(csv_data, sep='\t')
 
-    csv_length = int((len(list(face)) - 1) / 2)
+    csv_length = len(face)
 
-    print(csv_length)
+    print("Face length is",csv_length)
+
+    face = face.T
 
     success,image = video.read()
-    count = 0
-    while success and count < csv_offset:
-        success,image = video.read()
-        count += 1
-    
-    print("Finally got to proper offset.")
-    while success:   
-        index = count - csv_offset
-        if index >= csv_length:
+    face_index = 0 # face_index = back frame at this point
+
+    OFFSET = face[0]['frame id']
+
+    while True:   
+        back_index = face_index + face_offset
+        road_index = back_index - road_offset
+
+        face_data_index = back_index - OFFSET
+
+        if road_index >= csv_length:
+            print("Hit last frame in CSV")
             break
-        cv2.imwrite("../face_imgs/frame%d.png" % index, image)
-        print("Wrote frame %d" % index)
+        if face_data_index >= 0 and str(face[face_data_index]['faceX']) != 'nan':
+            cv2.imwrite("face_imgs/face_b%d_f%d.png" % (back_index, face_index), image)
+            print("Printing frame %d (road) | %d (back) | %d (face)" % (road_index, back_index, face_index))
+            print('Combined data line:', face[face_data_index])
+        else:
+            print("frame id %d (road) | %d (back) | %d (face)" % (road_index, back_index, face_index))
         success,image = video.read()
-        count += 1
+        face_index += 1
 
 
 if __name__ == '__main__':

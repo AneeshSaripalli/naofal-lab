@@ -451,14 +451,8 @@ public:
     v4l2_close(device);
 #endif
 
-    // find and open a USB camera (built in laptop camera, web cam etc)
-    //    m_cap = cv::VideoCapture("/media/sumit/Blackvue/calibrationshots/JAN16/mobilecam.mp4");
-    //    m_cap = cv::VideoCapture("/media/sumit/11A5-58D9/snaps_road/video_frames/face_1.avi");
-    //    m_cap = cv::VideoCapture("/home/sumit/april/videos17/videos_blender/vid2_540_light.avi");
-    //    m_cap = cv::VideoCapture("/media/sumit/20B6-AA16/ref_figure.png");
-    //cout<<in_file;
     m_cap = cv::VideoCapture(in_file);
-    //m_cap = cv::VideoCapture("/media/sumit/11A5-58D9/BlackVue/snaps/20160318_223506_NR.mp4_000027.376.png");
+
 
     if (!m_cap.isOpened())
     {
@@ -490,7 +484,7 @@ public:
     if (m_frame)
       writefile << frame << '\t';
     writefile << detection.id << '\t' << detection.hammingDistance << '\t';
-
+    //writefile << detection.//MFM
     // recovering the relative pose of a tag:
 
     // NOTE: for this to be accurate, it is necessary to use the
@@ -501,6 +495,8 @@ public:
     Eigen::Matrix3d rotation;
     detection.getRelativeTranslationRotation(m_tagSize, m_fx, m_fy, m_px, m_py,
                                              translation, rotation);
+    
+   //cout << ".............m_fx = " << m_fx << " m_fy = " << m_fy << endl; //mfm
 
     Eigen::Matrix3d F;
     F << 1, 0, 0,
@@ -517,7 +513,14 @@ public:
          << ", yaw=" << yaw
          << ", pitch=" << pitch
          << ", roll=" << roll
-         << ", p1 =" << detection.p[0].first
+         << ", p0f =" << detection.p[0].first
+	 << ", p0s =" << detection.p[0].second //mfm
+	 << ", p1f =" << detection.p[1].first //mfm
+	 << ", p1s =" << detection.p[1].second //mfm
+	 << ", p2f =" << detection.p[2].first
+	 << ", p2s =" << detection.p[2].second
+	 << ", p3f =" << detection.p[3].first
+	 << ", p3s =" << detection.p[3].second
          << endl;
     writefile << translation.norm() << '\t' << translation(0) << '\t' << translation(1) << '\t' << translation(2) << '\t' << yaw << '\t' << pitch << '\t' << roll << endl;
     writefile.close();
@@ -579,7 +582,12 @@ public:
       {
         // also highlight in the image
         detections[i].draw(image);
-      }
+	//cout << ".......Detection Size is "<< detections.size();		
+	//for (const auto& e :detections){
+	//	std::cout << e << std::endl;
+	}
+	
+
 
       string text = to_string(frame);
 

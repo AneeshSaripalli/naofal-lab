@@ -513,14 +513,14 @@ public:
          << ", yaw=" << yaw
          << ", pitch=" << pitch
          << ", roll=" << roll
-         << ", p0f =" << detection.p[0].first
-	 << ", p0s =" << detection.p[0].second //mfm
-	 << ", p1f =" << detection.p[1].first //mfm
-	 << ", p1s =" << detection.p[1].second //mfm
-	 << ", p2f =" << detection.p[2].first
-	 << ", p2s =" << detection.p[2].second
-	 << ", p3f =" << detection.p[3].first
-	 << ", p3s =" << detection.p[3].second
+         //<< ", p0f =" << detection.p[0].first
+	 //<< ", p0s =" << detection.p[0].second //mfm
+	 //<< ", p1f =" << detection.p[1].first //mfm
+	 //<< ", p1s =" << detection.p[1].second //mfm
+	 //<< ", p2f =" << detection.p[2].first
+	 //<< ", p2s =" << detection.p[2].second
+	 //<< ", p3f =" << detection.p[3].first
+	 //<< ", p3s =" << detection.p[3].second
          << endl;
     writefile << translation.norm() << '\t' << translation(0) << '\t' << translation(1) << '\t' << translation(2) << '\t' << yaw << '\t' << pitch << '\t' << roll << endl;
     writefile.close();
@@ -548,6 +548,7 @@ public:
     //      m_cap.retrieve(image);
 
     // detect April tags (requires a gray scale image)
+    //cout << "processImage having frame" << endl; //mfm
     cv::cvtColor(image, image_gray, CV_BGR2GRAY);
     double t0;
     if (m_timing)
@@ -677,9 +678,11 @@ public:
       // capture frame
       m_cap >> image;
       //      cout<<"\nframe before"<<frame;
-      cout << m_cap.get(CV_CAP_PROP_FRAME_WIDTH);
-      if ((image.size().width != 0) && (image.size().height != 0))
-        processImage(image, image_gray, frame);
+      //cout << m_cap.get(CV_CAP_PROP_FRAME_WIDTH);
+      //cout << "image width" << image.size().width << "image height" <<image.size().height << endl;  
+      if ((image.size().width == 0) || (image.size().height == 0))
+      	cout << "image width or height is zero" << std::endl; //mfm
+      processImage(image, image_gray, frame);
       //      cout<<endl<<image.size();
       //      imshow("wind1",image);
       //processImage(image, image_gray);

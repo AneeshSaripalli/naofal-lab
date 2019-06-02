@@ -44,8 +44,10 @@ def sync_back_and_visualize(visualize_path, back_path, visualize_frames):
 
     while row_counter < data_rows and frame_counter < frames:
         frame = int(df_back[row_counter]['frame id'])
+        detectionID = int(df_back[row_counter]['detection id'])
+        
 
-        if frame == 2222:
+        if detectionID == 2222:
             visualize_frames.write(
                 str(frame) + "\tnan\tnan\tnan\t1.0\t0.0\t0.0\t0.0" + "\n")
         else:

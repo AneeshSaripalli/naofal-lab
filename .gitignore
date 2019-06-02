@@ -6,7 +6,7 @@ apriltags/.svn/*
 .vscode
 *.mp4
 imgs/*
-.swp
-.swo
-.bak
-.bak2
+*.swp
+*.swo
+*.bak
+*.bak2

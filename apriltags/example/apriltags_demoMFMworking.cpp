@@ -71,9 +71,7 @@ const string usage = "\n"
 
                      "  -G <gain>       Manually set camera gain (default auto; range 0-255)\n"
                      "  -B <brightness> Manually set the camera brightness (default 128; range 0-255)\n"
-                     "  -b <startFrame> Manually set the start frame number\n"
-		     "  -e <endFrame>   Manually set the end frame number \n"
-		     "\n";
+                     "\n";
 
 const string intro = "\n"
                      "April tags test code\n"
@@ -179,9 +177,6 @@ class Demo
   string in_file;
   string in_folder;
 
-  int startF; //start the video with this frame number //mfm
-  int endF;  //end processing the video with this frame number //mfm
-
   int m_deviceId; // camera id (in case of multiple cameras)
 
   list<string> m_imgNames;
@@ -223,9 +218,6 @@ public:
            m_gain(-1),
            m_brightness(-1),
 
-           startF(0),
-	   endF(10000000),
-
            m_deviceId(0)
   {
   }
@@ -264,7 +256,7 @@ public:
   void parseOptions(int argc, char *argv[])
   {
     int c;
-    while ((c = getopt(argc, argv, ":h?afdtC:F:H:S:W:E:G:B:D:I:O:M:b:e:")) != -1)
+    while ((c = getopt(argc, argv, ":h?afdtC:F:H:S:W:E:G:B:D:I:O:M:")) != -1)
     {
       // Each option character has to be in the string in getopt();
       // the first colon changes the error character from '?' to ':';
@@ -315,16 +307,10 @@ public:
       case 'M':
         printf("Expecting a folder after this\n");
         in_folder = string(optarg);
+
         cout << "Parsed folder " << in_folder << std::endl;
+
         break;
-      case 'b':  //mfm
-	startF =  atof(optarg);
-	cout << "start video from frame number " << startF << std::endl;
-	break;
-      case 'e': //mfm
-	endF =  atof(optarg);
-	cout << "End video with frame number " << endF << std::endl;
-	break;
       case 'I':
         in_file = optarg;
         cout << in_file;
@@ -684,18 +670,9 @@ public:
     int frame = 0;
     cout << frame;
     double last_t = tic();
-    bool isNotEndFrame = true; //mfm
 
-    // convert start frame number to time
-    double frameRate = m_cap.get(CV_CAP_PROP_FPS); //mfm
-    double frameTime = 1000.0 * startF /frameRate; //mfm
-    m_cap.set(CV_CAP_PROP_POS_MSEC, frameTime); //mfm
-
-	
-
-    while(true)//while (m_cap.isOpened() && isNotEndFrame ) //mfm
+    while (true)
     {
-          
       cout << "Frame #\t" << frame << std::endl;
 
       // capture frame
@@ -727,13 +704,6 @@ public:
         cout << "\nkey pressed";
         break;
       }
-      if (startF + frame >=endF )
-      {
-	 cout <<"\n end frame reached";
-	 break;
-      }
-      
-	      
 
       if (frame >= m_cap.get(CV_CAP_PROP_FRAME_COUNT))
       {
@@ -756,14 +726,14 @@ int main(int argc, char *argv[])
   demo.parseOptions(argc, argv);
 
   demo.setup();
-  
+
   if (demo.isVideo())
   {
     cout << "Processing video" << endl;
-  
-    // setup image source, window for drawing, serial port... 
+
+    // setup image source, window for drawing, serial port...
     demo.setupVideo();
-    
+
     // the actual processing loop where tags are detected and visualized
     demo.loop();
   }

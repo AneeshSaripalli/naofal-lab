@@ -129,12 +129,15 @@ labelIDsUni = pickle.load(pickle_in)
 
 index = np.argwhere(labelIDsUni < 300)
 labelIDsRef = labelIDsUni[index]   # detected labels in reference video
+#print("IDs = ", labelIDsRef, '/n')
 
+XlabelRef = pickle.load(pickle_in)[index] # X values of the labels in reference video
+YlabelRef = pickle.load(pickle_in)[index] # Y values of the labels in ref video
+ZlabelRef = pickle.load(pickle_in)[index]
+#print("XlabelRef = ",XlabelRef, '/n')
+#print("YlabelRef = ",YlabelRef, '/n')
+#print("ZlabelRef = ",ZlabelRef, '/n')
 
-
-XlabelRef = pickle.load(pickle_in)[0][index] # X values of the labels in reference video
-YlabelRef = pickle.load(pickle_in)[0][index] # Y values of the labels in ref video
-ZlabelRef = pickle.load(pickle_in)[0][index]
 XYZref = np.hstack((XlabelRef, YlabelRef, ZlabelRef))
 
 

@@ -10,3 +10,4 @@ imgs/*
 *.swo
 *.bak
 *.bak2
+output/

@@ -577,10 +577,14 @@ public:
     }
 
     // print out each detection
-    cout << detections.size() << " tags detected:" << endl;
-    for (int i = 0; i < detections.size(); i++)
+    
+    if ((image.size().width != 0) && (image.size().height != 0))
     {
-      print_detection(detections[i], frame);
+	cout << detections.size() << " tags detected:" << endl;
+    	for (int i = 0; i < detections.size(); i++)
+    	{
+      		print_detection(detections[i], frame);
+    	}
     }
     std::ofstream writefile;
     writefile.open(outputfile, std::ofstream::out | std::ofstream::app);
@@ -591,7 +595,7 @@ public:
 
     //    cout<<"\nbefore draw3\n";
     // show the current image including any detections
-    if (m_draw)
+    if (m_draw && image.size().width != 0 && image.size().height != 0)
     {
       for (int i = 0; i < detections.size(); i++)
       {

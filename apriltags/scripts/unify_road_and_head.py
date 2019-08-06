@@ -80,7 +80,7 @@ def get_road_data(POSE_ALL, R2B, offset, face_csv_file):
         print("need to move road row ptr")
         road_row_ptr = -offset
 
-    face_header = "frame id\tfaceX\tfaceY\tfaceZ\tcomX\tcomY\tcomZ\tr\tphi\ttheta\n"
+    face_header = "frame id\tBigTagX\tBigTagY\tBigTagZ\tcomX\tcomY\tcomZ\tr\ttheta\tphi\n"
     face_csv_file.write(face_header)
 
     # doing frame by frame syncing
@@ -103,7 +103,7 @@ def get_road_data(POSE_ALL, R2B, offset, face_csv_file):
 
             sph = calc_spherical(face_to_april)
 
-            row = "%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (int(vis_f), face_to_april[0], face_to_april[1], face_to_april[2], 
+            row = "%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (int(vis_f), road_trans[0], road_trans[1], road_trans[2], 
                 -vis_row['z'], -vis_row['x'], vis_row['y'], sph[0], sph[1], sph[2]) 
             face_csv_file.write(row)
 
@@ -112,19 +112,35 @@ def get_road_data(POSE_ALL, R2B, offset, face_csv_file):
     face_csv_file.close()
  
 def main():
-    args = get_cmd_line_args()
+    
+    
+    mycmd = 1 # flag to switch between running using bash script vs debugging using terminal
+    if mycmd:
+        args = get_cmd_line_args()
+        #print("---------------------",args.road_to_back_normalized)
+        ROAD_TO_BACK_FILE = open(args.road_to_back_normalized, 'r')
+        VISUALIZE = open(args.visualize_output, 'r')
+        offset = args.delta_back_minus_road
+    else:
+        STD_VIS = "../../output/visualize_frames.csv"
+        STD_ROAD = "../../output/road_normalized.csv"
+        offset = 0
+        ROAD_TO_BACK_FILE = open(STD_ROAD, 'r')
+        VISUALIZE = open(STD_VIS, 'r')
+    
 
-    ROAD_TO_BACK_FILE = open(args.road_to_back_normalized, 'r')
-    VISUALIZE = open(args.visualize_output, 'r')
 
     R2B = pd.read_csv(ROAD_TO_BACK_FILE, sep='\t') # creating pandas dataframe from Road to Back CSV file
     POSE_ALL = pd.read_csv(VISUALIZE, sep='\t') # gettng head pose matrix from matlab file
 
-    face_csv_file = open("output/face_data.csv", 'w+') # opening output file for face csv data
+    if mycmd:
+        face_csv_file = open("output/ContGazeIntialLabelsAllFrames.csv", 'w+') # opening output file for face csv data
+        print("Syncing %s and %s with purported offset %d" % (args.road_to_back_normalized, args.visualize_output, offset))
+    else:
+        face_csv_file = open("../../output/ContGazeIntialLabelsAllFrames.csv", 'w+') # opening output file for face csv data
+        print("Syncing %s and %s with purported offset %d" % (STD_VIS, STD_ROAD, offset))
 
-    offset = args.delta_back_minus_road 
-
-    print("Syncing %s and %s with purported offset %d" % (args.road_to_back_normalized, args.visualize_output, offset))
+    
 
     get_road_data(POSE_ALL, R2B, offset, face_csv_file)
     

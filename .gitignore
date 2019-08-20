@@ -2,6 +2,9 @@ build/
 pod-build/
 back_imgs/
 road_imgs/
+face_imgs/
+output/
+
 apriltags/.svn/*
 .vscode
 *.mp4
@@ -10,4 +13,3 @@ imgs/*
 *.swo
 *.bak
 *.bak2
-output/

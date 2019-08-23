@@ -20,7 +20,7 @@ echo "Back video file is:   $1"
 ./apriltags/build/bin/apriltags_demo -F 1000 -W 1920 -H 1080 -S 0.032 -I $1 -O "$HAT_BACK" -d -f &
 
 #### Runs AprilTag with Back behind the scenes for calibration
-./apriltags/build/bin/apriltags_demo -F 1000 -W 1920 -H 1080 -S 0.04 -I $1 -O "$AprilTag_Calib_Back" -b 15 -e 7200 -d -f &
+./apriltags/build/bin/apriltags_demo -F 1000 -W 1920 -H 1080 -S 0.04 -I $1 -O "$AprilTag_Calib_Back" -b 15 -e 8000 -d -f &
 
 wait
 

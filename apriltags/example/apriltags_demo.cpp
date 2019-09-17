@@ -65,15 +65,15 @@ const string usage = "\n"
                      "                   Apricap 0.032\n"
                      "                   reference 0.032\n"
                      "		         road calib 0.176\n"
-		     "			 CalibInCar 0.04\n"
+                     "			 CalibInCar 0.04\n"
                      "                   white screen 0.16\n"
                      "  -E <exposure>   Manually set camera exposure (default auto; range 0-10000)\n"
 
                      "  -G <gain>       Manually set camera gain (default auto; range 0-255)\n"
                      "  -B <brightness> Manually set the camera brightness (default 128; range 0-255)\n"
                      "  -b <startFrame> Manually set the start frame number\n"
-		     "  -e <endFrame>   Manually set the end frame number \n"
-		     "\n";
+                     "  -e <endFrame>   Manually set the end frame number \n"
+                     "\n";
 
 const string intro = "\n"
                      "April tags test code\n"
@@ -180,7 +180,7 @@ class Demo
   string in_folder;
 
   int startF; //start the video with this frame number //mfm
-  int endF;  //end processing the video with this frame number //mfm
+  int endF;   //end processing the video with this frame number //mfm
 
   int m_deviceId; // camera id (in case of multiple cameras)
 
@@ -224,7 +224,7 @@ public:
            m_brightness(-1),
 
            startF(0),
-	   endF(10000000),
+           endF(10000000),
 
            m_deviceId(0)
   {
@@ -317,14 +317,14 @@ public:
         in_folder = string(optarg);
         cout << "Parsed folder " << in_folder << std::endl;
         break;
-      case 'b':  //mfm
-	startF =  atof(optarg);
-	cout << "start video from frame number " << startF << std::endl;
-	break;
+      case 'b': //mfm
+        startF = atof(optarg);
+        cout << "start video from frame number " << startF << std::endl;
+        break;
       case 'e': //mfm
-	endF =  atof(optarg);
-	cout << "End video with frame number " << endF << std::endl;
-	break;
+        endF = atof(optarg);
+        cout << "End video with frame number " << endF << std::endl;
+        break;
       case 'I':
         in_file = optarg;
         cout << in_file;
@@ -467,7 +467,6 @@ public:
 
     m_cap = cv::VideoCapture(in_file);
 
-
     if (!m_cap.isOpened())
     {
       cerr << "ERROR: Can't find video device " << m_deviceId << "\n";
@@ -509,8 +508,6 @@ public:
     Eigen::Matrix3d rotation;
     detection.getRelativeTranslationRotation(m_tagSize, m_fx, m_fy, m_px, m_py,
                                              translation, rotation);
-    
-   //cout << ".............m_fx = " << m_fx << " m_fy = " << m_fy << endl; //mfm
 
     Eigen::Matrix3d F;
     F << 1, 0, 0,
@@ -528,13 +525,13 @@ public:
          << ", pitch=" << pitch
          << ", roll=" << roll
          //<< ", p0f =" << detection.p[0].first
-	 //<< ", p0s =" << detection.p[0].second //mfm
-	 //<< ", p1f =" << detection.p[1].first //mfm
-	 //<< ", p1s =" << detection.p[1].second //mfm
-	 //<< ", p2f =" << detection.p[2].first
-	 //<< ", p2s =" << detection.p[2].second
-	 //<< ", p3f =" << detection.p[3].first
-	 //<< ", p3s =" << detection.p[3].second
+         //<< ", p0s =" << detection.p[0].second //mfm
+         //<< ", p1f =" << detection.p[1].first //mfm
+         //<< ", p1s =" << detection.p[1].second //mfm
+         //<< ", p2f =" << detection.p[2].first
+         //<< ", p2s =" << detection.p[2].second
+         //<< ", p3f =" << detection.p[3].first
+         //<< ", p3s =" << detection.p[3].second
          << endl;
     writefile << translation.norm() << '\t' << translation(0) << '\t' << translation(1) << '\t' << translation(2) << '\t' << yaw << '\t' << pitch << '\t' << roll << endl;
     writefile.close();
@@ -562,7 +559,6 @@ public:
     //      m_cap.retrieve(image);
 
     // detect April tags (requires a gray scale image)
-    //cout << "processImage having frame" << endl; //mfm
     cv::cvtColor(image, image_gray, CV_BGR2GRAY);
     double t0;
     if (m_timing)
@@ -577,36 +573,25 @@ public:
     }
 
     // print out each detection
-    
-    if ((image.size().width != 0) && (image.size().height != 0))
+
+    cout << detections.size() << " tags detected:" << endl;
+    for (int i = 0; i < detections.size(); i++)
     {
-	cout << detections.size() << " tags detected:" << endl;
-    	for (int i = 0; i < detections.size(); i++)
-    	{
-      		print_detection(detections[i], frame);
-    	}
+      print_detection(detections[i], frame);
     }
     std::ofstream writefile;
     writefile.open(outputfile, std::ofstream::out | std::ofstream::app);
-    //    cout<<"\nbefore draw1\n";
     writefile << "2222\t2222\t2222\t2222\t2222\t2222\t2222\t2222\t2222\t2222\n";
-    //    cout<<"\nbefore draw2\n";
     writefile.close();
 
-    //    cout<<"\nbefore draw3\n";
     // show the current image including any detections
-    if (m_draw && image.size().width != 0 && image.size().height != 0)
+    if (m_draw)
     {
       for (int i = 0; i < detections.size(); i++)
       {
         // also highlight in the image
         detections[i].draw(image);
-	//cout << ".......Detection Size is "<< detections.size();		
-	//for (const auto& e :detections){
-	//	std::cout << e << std::endl;
-	}
-	
-
+      }
 
       string text = to_string(frame);
 
@@ -614,10 +599,8 @@ public:
       cv::putText(image, text, cv::Point(0, 1000), CV_FONT_HERSHEY_SIMPLEX, 5, CV_RGB(255, 0, 0), 10);
       cv::resize(image, resized, cv::Size(960, 720));
 
-      imshow(windowName, resized); // OpenCV call
-                                   //     cout<<"after draw";
-                                   //     cout<<"hello!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
-                                   //outputVideo << image;
+      imshow(windowName, resized);
+
       char buff[100];
       snprintf(buff, sizeof(buff), "../imgs/img%d.png", frame);
       std::string buffAsStdStr = buff;
@@ -691,29 +674,24 @@ public:
     bool isNotEndFrame = true; //mfm
 
     // convert start frame number to time
-    double frameRate = m_cap.get(CV_CAP_PROP_FPS); //mfm
-    double frameTime = 1000.0 * startF /frameRate; //mfm
-    m_cap.set(CV_CAP_PROP_POS_MSEC, frameTime); //mfm
+    double frameRate = m_cap.get(CV_CAP_PROP_FPS);  //mfm
+    double frameTime = 1000.0 * startF / frameRate; //mfm
+    m_cap.set(CV_CAP_PROP_POS_MSEC, frameTime);     //mfm
 
-	
-
-    while(true)//while (m_cap.isOpened() && isNotEndFrame ) //mfm
+    while (true)
     {
-          
+
       cout << "Frame #\t" << frame << std::endl;
 
       // capture frame
       m_cap >> image;
-      //      cout<<"\nframe before"<<frame;
-      //cout << m_cap.get(CV_CAP_PROP_FRAME_WIDTH);
-      //cout << "image width" << image.size().width << "image height" <<image.size().height << endl;  
+
       if ((image.size().width == 0) || (image.size().height == 0))
-      	cout << "image width or height is zero" << std::endl; //mfm
+      {
+        cout << "Found a null frame." << std::endl; //mfm
+        continue;
+      }
       processImage(image, image_gray, frame);
-      //      cout<<endl<<image.size();
-      //      imshow("wind1",image);
-      //processImage(image, image_gray);
-      //      cout<<"frame after"<<frame;
 
       // print out the frame rate at which image frames are being processed
       frame++;
@@ -727,17 +705,14 @@ public:
       // exit if any key is pressed
       if (cv::waitKey(1) == 'q')
       {
-        //	      cout<<cv::waitKey(1);
         cout << "\nkey pressed";
         break;
       }
-      if (startF + frame >=endF )
+      if (startF + frame >= endF)
       {
-	 cout <<"\n end frame reached";
-	 break;
+        cout << "\n end frame reached";
+        break;
       }
-      
-	      
 
       if (frame >= m_cap.get(CV_CAP_PROP_FRAME_COUNT))
       {
@@ -760,14 +735,14 @@ int main(int argc, char *argv[])
   demo.parseOptions(argc, argv);
 
   demo.setup();
-  
+
   if (demo.isVideo())
   {
     cout << "Processing video" << endl;
-  
-    // setup image source, window for drawing, serial port... 
+
+    // setup image source, window for drawing, serial port...
     demo.setupVideo();
-    
+
     // the actual processing loop where tags are detected and visualized
     demo.loop();
   }

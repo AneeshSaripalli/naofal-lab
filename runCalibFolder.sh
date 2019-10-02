@@ -1,6 +1,37 @@
 #!/bin/bash
 
+# HEADS UP PLEASE READ THIS
+# FG stands for Fixed Gaze
+# CG stands for Continous Gaze
+
+
+# When running this, you may need to adjust the [FG/CG]_[BACK/FACE]_[START/END] frame starting
+# and ending values. These values specify the frames to use in AprilTag for calibration.
+# no synchronization is required for these frames - we just need at least 3 commonly detected tags 
+# between the current reference frame and the base reference frame (stored in the pickles)
+# these base reference frames are stored twice in this directory (for no good reason),
+# once in ./config
+# once in ./apriltags/scripts/calibration/calib-files
+
 # ./runCalibFolder <calib folder> <back calib picle> <face calib pickle>
+
+# sample usage is as follows.
+# calib specifies the root directory to look for all drives
+# ./runCalibFolder.sh ~/Desktop/shared/calib ./apriltags/scripts/calibration/calib_files/BackCalibAll2019-6-20.pickle ./apriltags/scripts/calibration/calib_files/FaceCalib2019-6-20.pickle 
+
+
+# expected folder struct
+
+# root
+    # <drive folder 1>
+        # cg
+            # cg_ap.csv         Processed apriltag for continuous gaze
+            # cg_face.mp4       Raw continuous gaze face video for calibration
+            # cg_back.mp4       Raw continuous gaze back video for calibration
+        # fg
+            # fg_ap.csv         Processed apriltag for fixed gaze
+            # fg_face.mp4       Raw fixed gaze face video for calibration
+
 
 
 CALIB_FOLDER=$1
@@ -9,18 +40,26 @@ FACE_CALIB=$3
 
 echo "Calibration folder is $CALIB_FOLDER"
 
-FG_FACE_START=(0 2 3 4)
-FG_FACE_END=(300 3 4 5)
+### DEFINE FRAMES FOR CALIBRATION
 
-CG_FACE_START=(0 2 3 4)
-CG_FACE_END=(300 2 3 4)
+FG_FACE_START=(0 0 0 0 0 0 0 0 0 0 0)
+FG_FACE_END=(300 300 300 300 300 300 300 300 300 300 300)
 
-CG_BACK_START=(11100 2 3 4)
-CG_BACK_END=(11400 2 3 4)
+CG_FACE_START=(0 0 0 0 0 0 0 0 0 0 0)
+CG_FACE_END=(300 300 300 300 300 300 300 300 300 300 300)
 
+CG_BACK_START=(11100 0 0 0 0 0 0 0 0 0 0)
+CG_BACK_END=(11400 300 300 300 300 300 300 300 300 300)
+
+### END CALIB FRAMES DEFINITION ###
+
+if [ ! -d "./output" ]; then
+    mkdir output
+fi
 
 index=0
-for f in $1/; do
+# iterates through all files in root dir
+for f in $1/*; do 
     echo "Folder $index: $f"
     CG_HOME=$f/cg
 
@@ -28,18 +67,17 @@ for f in $1/; do
     CG_BACK=$CG_HOME/cg_back.mp4
     CG_FACE=$CG_HOME/cg_face.mp4
 
-    
-    mkdir $f"output"
+    mkdir "$f/output"
 
-    echo $f"output"
+    echo "$f/output"
 
     rm -f output/*
 
-    mkdir $f"output/fg"
+    mkdir "$f/output/fg"
     
     ./runContGazeCalibration.sh $CG_AP $CG_FACE ${CG_FACE_START[index]} ${CG_FACE_END[index]} $CG_BACK ${CG_BACK_START[index]} ${CG_BACK_END[index]} $BACK_CALIB $FACE_CALIB
 
-    cp -r output $f"output/fg"
+    cp -r output "$f/output/fg"
 
     ### END OF CONT GAZE
 
@@ -50,12 +88,15 @@ for f in $1/; do
 
     rm -f output/*
 
-    mkdir $f"output/cg"
+    mkdir "$f/output/cg"
 
     ./runFixedGazeCalibration.sh $FG_FACE $FG_AP ${FG_FACE_START[index]} ${FG_FACE_END[index]} $BACK_CALIB $FACE_CALIB
 
-    cp -r output $f"output/cg"
+    cp -r output "$f/output/cg"
 
     ((index=index+1))
 
 done
+
+rm -f output/*
+

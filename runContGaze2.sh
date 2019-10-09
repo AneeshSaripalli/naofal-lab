@@ -3,9 +3,9 @@
 STD_ROAD="output/road_normalized.csv"
 STD_VIS="output/visualize_frames.csv"
 
-AP_BACK="output/D2019-7-11/ContGaze/AprilBackOutdoor.csv"
-AP_ROAD="output/D2019-7-11/ContGaze/AprilRoadOutdoor.csv"
-HAT_BACK="output/D2019-7-11/ContGaze/AprilHatContGaze.csv"
+AP_BACK="output/D2019-5-22/ContGaze/AprilBackOutdoor.csv"
+AP_ROAD="output/D2019-5-22/ContGaze/AprilRoadOutdoor.csv"
+HAT_BACK="output/D2019-5-22/ContGaze/AprilHatContGaze.csv"
 
 OP_R2B="output/road_proj_to_back.csv"
 OP_FACE="output/ContGazeIntialLabelsAllFrames.csv"

@@ -8,7 +8,7 @@ fi
 HAT_BACK="output/AprilTag_Hat1.csv"
 OP_VIS="visualize_2/meshsave_back_2.mat"
 AprilTag_Calib_Back="output/AprilTag_CalibBack1.csv"
-Ref_Calib_Back="output/Calibration2019-6-20/MarkersAppended2019-6-20.pickle"
+Ref_Calib_Back="config/MarkersAppended2019-6-20.pickle"
 KabaschRotTrans="output/KabaschRotTrans.pickle"
 
 

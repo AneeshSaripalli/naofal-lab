@@ -42,14 +42,14 @@ echo "Calibration folder is $CALIB_FOLDER"
 
 ### DEFINE FRAMES FOR CALIBRATION
 
-FG_FACE_START=(0 0 0 0 0 0 0 0 0 0 0)
-FG_FACE_END=(300 300 300 300 300 300 300 300 300 300 300)
+FG_FACE_START=(14400 0 3600) #(0 0 0 0 0 0 0 0 0 0 0)
+FG_FACE_END=(18000 3605 7210) #(11400 11400 11400 300 300 300 300 300 300 300 300)
 
-CG_FACE_START=(0 0 0 0 0 0 0 0 0 0 0)
-CG_FACE_END=(300 300 300 300 300 300 300 300 300 300 300)
+CG_FACE_START=(0 0 0) #(0 0 0 0 0 0 0 0 0 0 0)
+CG_FACE_END=(3600 3600 3600) #(11400 11400 11400 300 300 300 300 300 300 300 300)
 
-CG_BACK_START=(11100 0 0 0 0 0 0 0 0 0 0)
-CG_BACK_END=(11400 300 300 300 300 300 300 300 300 300)
+CG_BACK_START=(0 0 0) #(0 0 0 0 0 0 0 0 0 0 0)
+CG_BACK_END=(3600 3600 3600) #(11400 11400 11400 300 300 300 300 300 300 300)
 
 ### END CALIB FRAMES DEFINITION ###
 
@@ -60,39 +60,33 @@ fi
 index=0
 # iterates through all files in root dir
 for f in $1/*; do 
-    echo "Folder $index: $f"
-    CG_HOME=$f/cg
+    #echo "Folder $index: $f"
+    #CG_HOME=$f/cg
 
-    CG_AP=$CG_HOME/cg_ap.csv
-    CG_BACK=$CG_HOME/cg_back.mp4
-    CG_FACE=$CG_HOME/cg_face.mp4
+    #CG_AP=$CG_HOME/AnglesIDfile.csv
+    #CG_BACK=$CG_HOME/BContGaze.mp4
+    #CG_FACE=$CG_HOME/FContGaze.mp4
 
-    mkdir "$f/output"
+    #echo "$f/output"
 
-    echo "$f/output"
-
-    rm -f output/*
-
-    mkdir "$f/output/fg"
+    #rm -f output/*
     
-    ./runContGazeCalibration.sh $CG_AP $CG_FACE ${CG_FACE_START[index]} ${CG_FACE_END[index]} $CG_BACK ${CG_BACK_START[index]} ${CG_BACK_END[index]} $BACK_CALIB $FACE_CALIB
+    #./runContGazeCalibration.sh $CG_AP $CG_FACE ${CG_FACE_START[index]} ${CG_FACE_END[index]} $CG_BACK ${CG_BACK_START[index]} ${CG_BACK_END[index]} $BACK_CALIB $FACE_CALIB
 
-    cp -r output "$f/output/fg"
+    #cp -r output "$f/cg"
 
     ### END OF CONT GAZE
 
     FG_HOME=$f/fg
 
-    FG_AP=$FG_HOME/fg_ap.csv
-    FG_FACE=$FG_HOME/fg_face.mp4
+    FG_AP=$FG_HOME/AnglesIDfile.csv
+    FG_FACE=$FG_HOME/FfixedGaze.mp4
 
     rm -f output/*
 
-    mkdir "$f/output/cg"
-
     ./runFixedGazeCalibration.sh $FG_FACE $FG_AP ${FG_FACE_START[index]} ${FG_FACE_END[index]} $BACK_CALIB $FACE_CALIB
 
-    cp -r output "$f/output/cg"
+    cp -r output "$f/fg"
 
     ((index=index+1))
 

@@ -42,14 +42,14 @@ echo "Calibration folder is $CALIB_FOLDER"
 
 ### DEFINE FRAMES FOR CALIBRATION
 
-FG_FACE_START=(14400 0 3600) #(0 0 0 0 0 0 0 0 0 0 0)
-FG_FACE_END=(18000 3605 7210) #(11400 11400 11400 300 300 300 300 300 300 300 300)
+FG_FACE_START=(36000 36000 10800 10800 14400 0 7200 36000 7200) #(14400 0 3600) #(0 0 0 0 0 0 0 0 0 0 0)
+FG_FACE_END=(43200 43200 18000 14400 18000 3600 10800 39600 10800) #(18000 3605 7210) #(11400 11400 11400 300 300 300 300 300 300 300 300)
 
-CG_FACE_START=(0 0 0) #(0 0 0 0 0 0 0 0 0 0 0)
-CG_FACE_END=(3600 3600 3600) #(11400 11400 11400 300 300 300 300 300 300 300 300)
+CG_FACE_START=(0 0 0 0 0 0 0 0 0) #(0 0 0) #(0 0 0 0 0 0 0 0 0 0 0)
+CG_FACE_END=(3600 3600 3600 3600 3600 3600 3600 3600 3600) #(3600 3600 3600) #(11400 11400 11400 300 300 300 300 300 300 300 300)
 
-CG_BACK_START=(0 0 0) #(0 0 0 0 0 0 0 0 0 0 0)
-CG_BACK_END=(3600 3600 3600) #(11400 11400 11400 300 300 300 300 300 300 300)
+CG_BACK_START=(0 0 0 0 0 0 0 0 0) #(0 0 0) #(0 0 0 0 0 0 0 0 0 0 0)
+CG_BACK_END=(3600 3600 10800 10800 3600 3600 3600 3600 3600) #(3600 3600 3600) #(11400 11400 11400 300 300 300 300 300 300 300)
 
 ### END CALIB FRAMES DEFINITION ###
 
@@ -60,20 +60,20 @@ fi
 index=0
 # iterates through all files in root dir
 for f in $1/*; do 
-    #echo "Folder $index: $f"
-    #CG_HOME=$f/cg
+    echo "Folder $index: $f"
+    CG_HOME=$f/cg
 
-    #CG_AP=$CG_HOME/AnglesIDfile.csv
-    #CG_BACK=$CG_HOME/BContGaze.mp4
-    #CG_FACE=$CG_HOME/FContGaze.mp4
+    CG_AP=$CG_HOME/AnglesIDfile.csv
+    CG_BACK=$CG_HOME/BContGaze.mp4
+    CG_FACE=$CG_HOME/FContGaze.mp4
 
-    #echo "$f/output"
+    echo "$f/output"
 
-    #rm -f output/*
+    rm -f output/*
     
-    #./runContGazeCalibration.sh $CG_AP $CG_FACE ${CG_FACE_START[index]} ${CG_FACE_END[index]} $CG_BACK ${CG_BACK_START[index]} ${CG_BACK_END[index]} $BACK_CALIB $FACE_CALIB
+    ./runContGazeCalibration.sh $CG_AP $CG_FACE ${CG_FACE_START[index]} ${CG_FACE_END[index]} $CG_BACK ${CG_BACK_START[index]} ${CG_BACK_END[index]} $BACK_CALIB $FACE_CALIB
 
-    #cp -r output "$f/cg"
+    cp -r output "$f/cg"
 
     ### END OF CONT GAZE
 

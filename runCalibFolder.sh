@@ -71,6 +71,11 @@ for f in $1/*; do
 
     rm -f output/*
     
+
+    mv $CG_HOME/output/CURR_BACK_AP_TAG_OUTPUT.csv output/
+    mv $CG_HOME/output/CURR_FACE_AP_TAG_OUTPUT.csv output/
+    
+    echo "ContinuousGaze $f"
     ./runContGazeCalibration.sh $CG_AP $CG_FACE ${CG_FACE_START[index]} ${CG_FACE_END[index]} $CG_BACK ${CG_BACK_START[index]} ${CG_BACK_END[index]} $BACK_CALIB $FACE_CALIB
 
     cp -r output "$f/cg"
@@ -83,7 +88,10 @@ for f in $1/*; do
     FG_FACE=$FG_HOME/FfixedGaze.mp4
 
     rm -f output/*
+    
+    mv $FG_HOME/output/CURR_FACE_AP_TAG_OUTPUT.csv output/
 
+    echo "FixedGaze $f"
     ./runFixedGazeCalibration.sh $FG_FACE $FG_AP ${FG_FACE_START[index]} ${FG_FACE_END[index]} $BACK_CALIB $FACE_CALIB
 
     cp -r output "$f/fg"

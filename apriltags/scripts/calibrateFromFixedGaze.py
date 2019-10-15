@@ -49,7 +49,8 @@ def parse_com(row):
 
 
 def parse_target(row):
-    return (row["Xtarget"], row["Ytarget"], row["Ztarget"])
+    # Target was with refrence to com. So we need to get the absoloute path first 
+    return (row["Xtarget"]+row["Xcom"], row["Ytarget"]+row["Ycom"], row["Ztarget"]+row["Zcom"]) 
 
 
 def apply_tfms(vec, back_face_tfm, face_ref_curr_tfm):
@@ -64,6 +65,7 @@ def apply_tfms(vec, back_face_tfm, face_ref_curr_tfm):
 def calib_row(row, back_face_tfm, face_ref_curr_tfm):
     tgt = parse_target(row)
     com = parse_com(row)
+    #tgt += com
 
     #print("ORG TGT", tgt)
     tgt_tfm = apply_tfms(tgt, back_face_tfm, face_ref_curr_tfm)
@@ -123,8 +125,13 @@ def orchestrate_fg(apriltag, anglesId, refBack, refFace):
             print('Target Label:', row["labels"])
 
         (target_tfmd, com_tfmd) = calib_row(row, back_face_tfm, face_face_tfm)
+	
+	# Flip x-axis to get meaningful angles, flip y-axis as well to preserve the left hand rule 
         target_tfmd[0] = -target_tfmd[0]
         com_tfmd[0] = -com_tfmd[0]
+
+        target_tfmd[1] = -target_tfmd[1]
+        com_tfmd[1] = -com_tfmd[1]
 
         gaze_vector = np.subtract(target_tfmd, com_tfmd)
 
@@ -170,7 +177,7 @@ def orchestrate_fg(apriltag, anglesId, refBack, refFace):
         angles.ix[i, "Ztarget"] = target_tfmd[2]
 
     angles.to_csv(r'./output/AnglesId_Fixed_Gaze_Calib.csv',
-                  sep='\t', index=False)
+                  sep='\t', index=False, na_rep = "nan" )
 
     print("Azim := ({}, {})".format(minA, maxA))
     print("Elev := ({}, {})".format(minE, maxE))

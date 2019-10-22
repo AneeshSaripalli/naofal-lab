@@ -35,3 +35,5 @@ $APRIL_TAG -F 1000 -W 1920 -H 1080 -S 0.04 -I $FACE_VIDEO_PATH -O $CURR_FACE -d 
 python3 $CALIB_SCRIPT $CURR_FACE $ANGLES_ID_FILE $BACK_CALIB_PICKLE $FACE_CALIB_PICKLE
 
 # TEST COMMAND: python3 apriltags/scripts/calibrateFromFixedGaze.py ./output/CURR_FACE_AP_TAG_OUTPUT.csv ~/Desktop/shared/calib_files/AnglesIDfile.csv ./apriltags/scripts/calibration/calib_files/BackCalibAll2019-6-20.pickle ./apriltags/scripts/calibration/calib_files/FaceCalib2019-6-20.pickle 
+
+ 

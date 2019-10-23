@@ -13,10 +13,10 @@ import pickle
 import rmsd
 
 ### --- CONSTANTS --- ###
-
-FACE_CURR = "./calib_files/FaceCurr2019-6-14.pickle"
+# These values are only used if you run this file indvidully. If you run pipeline these parameters are not used(bec. you call only the needed functions)
+FACE_CURR = "./calib_files/FaceCurr2019-6-14.pickle"  
 FACE_REF = "./calib_files/FaceCalib2019-6-20.pickle"
-BACK_REF = "./calib_files/BackCalibAll2019-6-20.pickle"
+BACK_REF = "./calib_files/BackCalibAll2019-6-20Rmv300.pickle"
 FACE_TRANSFORM_PATH = "./calib_files/FaceCurrToRef.pickle"
 BACK_TO_FACE_TRANSFORM_PATH = "./calib_files/BackToFaceRefCalib.pickle"
 
@@ -117,11 +117,11 @@ def find_transform(curr_path, goal_path):
     print("Found common markers {}.".format(common_markers))
     print("Using {} for Kabsch transformation.".format(common_markers))
 
-    count_1 = get_count(curr_path)
-    count_2 = get_count(goal_path)
+    #count_1 = get_count(curr_path)
+    #count_2 = get_count(goal_path)
 
-    common_markers = list(filter(lambda x: (count_1[np.where(curr_markers == x)[
-                          0][0]] != 0 and count_2[np.where(goal_markers == x)[0][0]] != 0), common_markers))
+    #common_markers = list(filter(lambda x: (count_1[np.where(curr_markers == x)[
+    #                      0][0]] != 0 and count_2[np.where(goal_markers == x)[0][0]] != 0), common_markers))
 
     curr_indexes = [(np.where(curr_markers == cm)[0][0])
                     for cm in common_markers]

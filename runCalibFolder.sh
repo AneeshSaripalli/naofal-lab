@@ -17,7 +17,7 @@
 
 # sample usage is as follows.
 # calib specifies the root directory to look for all drives
-# ./runCalibFolder.sh ~/Desktop/shared/calib ./apriltags/scripts/calibration/calib_files/BackCalibAll2019-6-20.pickle ./apriltags/scripts/calibration/calib_files/FaceCalib2019-6-20.pickle 
+# ./runCalibFolder.sh ~/Desktop/shared/calib ./apriltags/scripts/calibration/calib_files/BackCalibAll2019-6-20Rmv300.pickle ./apriltags/scripts/calibration/calib_files/FaceCalib2019-6-20.pickle 
 
 
 # expected folder struct
